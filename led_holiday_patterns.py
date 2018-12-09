@@ -8,6 +8,7 @@ from led_colour import Colour
 
 import random
 import time
+from datetime import datetime
 
 # Configure the count of pixels:
 PIXEL_COUNT = 86
@@ -21,18 +22,47 @@ SPI_DEVICE = 0
 PIXELS = Adafruit_WS2801.WS2801Pixels(
             PIXEL_COUNT, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
 
-# Clear all the pixels to turn them off.
-PIXELS.clear()
-PIXELS.show()  # Make sure to call show() after changing any pixels!
+# Brightness adjustment by time of day.
+RAMP_UP_HOUR_START = 7
+RAMP_UP_MINUTE_START = RAMP_UP_HOUR_START * 60
+RAMP_UP_HOUR_END = 9
+RAMP_UP_DURATION_MINUTES = (RAMP_UP_HOUR_END - RAMP_UP_HOUR_START) * 60
+RAMP_DOWN_HOUR_START = 16
+RAMP_DOWN_MINUTE_START = RAMP_DOWN_HOUR_START * 60
+RAMP_DOWN_HOUR_END = 21
+RAMP_DOWN_DURATION_MINUTES = (RAMP_DOWN_HOUR_END - RAMP_DOWN_HOUR_START) * 60
+MAX_BRIGHTNESS = 1.0
+MIN_BRIGHTNESS = 0.1
+BRIGHTNESS_DELTA = MAX_BRIGHTNESS - MIN_BRIGHTNESS
 
 class InterpolationMode:
   LINEAR = 1
   QUADRATIC = 2
   CUBIC = 3
 
+# Breaks if the ramp up or down times cross a daily border.
+def brightness_factor():
+  current_time = datetime.now().time()
+  current_hour = current_time.hour
+  if current_hour < RAMP_UP_HOUR_START or current_hour >= RAMP_DOWN_HOUR_END:
+    return MIN_BRIGHTNESS
+  if current_hour >= RAMP_UP_HOUR_END and current_hour < RAMP_DOWN_HOUR_START:
+    return MAX_BRIGHTNESS
+
+  minute_of_day = current_hour * 60.0 + current_time.minute
+  if current_hour < RAMP_UP_HOUR_END:
+    completion = (
+        (minute_of_day - RAMP_UP_MINUTE_START) / RAMP_UP_DURATION_MINUTES)
+    return completion * BRIGHTNESS_DELTA + MIN_BRIGHTNESS
+  
+  completion = (
+        (minute_of_day - RAMP_DOWN_MINUTE_START) / RAMP_DOWN_DURATION_MINUTES)
+  return (1 - completion) * BRIGHTNESS_DELTA + MIN_BRIGHTNESS
+
 def display(pixels, led, colour):
   led = led if START_TO_END else PIXEL_COUNT - led - 1
-  pixels.set_pixel_rgb(led, colour.r, colour.g, colour.b)
+  dimmed_colour = colour.multiply(brightness_factor())
+  pixels.set_pixel_rgb(led, dimmed_colour.r, dimmed_colour.g, dimmed_colour.b)
 
 def compare(colour1, colour2, colours):
   return colours.index(colour1) < colours.index(colour2)
@@ -270,6 +300,7 @@ def smoothbow(colours, period, increment, duration, interpolation_mode):
     PIXELS.show()
     time.sleep(period)
 
+# Start up the app.
 algorithms = [
   lambda duration:
       stream(
@@ -313,6 +344,10 @@ algorithms = [
           duration,
           InterpolationMode.QUADRATIC)
 ]
+
+# Clear all the pixels to turn them off.
+PIXELS.clear()
+PIXELS.show()  # Make sure to call show() after changing any pixels!
 
 while(True):
   algorithms[random.randint(0, len(algorithms) - 1)](random.randint(20, 40))
