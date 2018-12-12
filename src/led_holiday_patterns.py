@@ -8,7 +8,8 @@ from datetime import datetime
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_WS2801
 
-import led_colour
+from colour import led_colour
+from colour.cubic_interpolation import CubicInterpolation
 
 # Configure the count of pixels:
 PIXEL_COUNT = 86
@@ -254,18 +255,18 @@ def distance_to_colour(index, colour_position, moving_right):
     return distance
 
 
-def interpolate(colour1, colour2, distance_to_colour1, segment_length, mode):
-    factor1 = 1 - (distance_to_colour1 / segment_length)
-    factor2 = 1 - factor1
-
-    if mode == InterpolationMode.QUADRATIC:
-        factor1 *= factor1
-        factor2 *= factor2
-    if mode == InterpolationMode.CUBIC:
-        factor1 *= factor1 * factor1
-        factor2 *= factor2 * factor2
-
-    return colour1.multiply(factor1).add(colour2.multiply(factor2))
+# def interpolate(colour1, colour2, distance_to_colour1, segment_length, mode):
+#     factor1 = 1 - (distance_to_colour1 / segment_length)
+#     factor2 = 1 - factor1
+#
+#     if mode == InterpolationMode.QUADRATIC:
+#         factor1 *= factor1
+#         factor2 *= factor2
+#     if mode == InterpolationMode.CUBIC:
+#         factor1 *= factor1 * factor1
+#         factor2 *= factor2 * factor2
+#
+#     return colour1.multiply(factor1).add(colour2.multiply(factor2))
 
 
 def smoothbow(colours, period, increment, duration, interpolation_mode):
@@ -298,12 +299,10 @@ def smoothbow(colours, period, increment, duration, interpolation_mode):
                 display(
                   PIXELS,
                   i,
-                  interpolate(
+                  interpolation_mode.interpolate(
                     nearest_colours[0][0],
                     nearest_colours[1][0],
-                    nearest_colours[0][1],
-                    segment_length,
-                    interpolation_mode))
+                    1 - (nearest_colours[0][1] / segment_length)))
             else:
                 print("Detected {0} nearest colours. Expected 1 or 2."
                       .format(num_nearest_colours))
@@ -360,7 +359,7 @@ algorithms = [
       0,
       0.25,
       duration,
-      InterpolationMode.QUADRATIC)
+      CubicInterpolation())
 ]
 
 # Clear all the pixels to turn them off.
