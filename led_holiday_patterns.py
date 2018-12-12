@@ -1,14 +1,14 @@
 # Animates random patterns on a WS2801 LED strip with traditional holiday
 # colours.
 
-import Adafruit_WS2801
-import Adafruit_GPIO.SPI as SPI
-
-from led_colour import Colour
-
 import random
 import time
 from datetime import datetime
+
+import Adafruit_GPIO.SPI as SPI
+import Adafruit_WS2801
+
+import led_colour
 
 # Configure the count of pixels:
 PIXEL_COUNT = 86
@@ -74,12 +74,12 @@ def compare(colour1, colour2, colours):
 
 def stream(colours, period, duration):
     print(
-        "Starting stream with colours [{0}]!"
-            .format(", ".join(str(c) for c in colours)))
+        "Starting stream with colours [{0}]!".format(
+          ", ".join(str(c) for c in colours)))
     shift = 0
     num_colours = len(colours)
     start_time = time.time()
-    while (time.time() - start_time < duration):
+    while time.time() - start_time < duration:
         for i in range(PIXEL_COUNT):
             colour_index = i % num_colours
             shifted_colour = (colour_index + shift) % num_colours
@@ -93,9 +93,9 @@ def assign_random_leds(colours, period):
     # Create a random array of colours the length of the strip.
     strip_colours = []
     for i in range(0, PIXEL_COUNT):
-        led_colour = colours[random.randint(0, len(colours) - 1)]
-        strip_colours.append(led_colour)
-        display(PIXELS, i, led_colour)
+        colour = colours[random.randint(0, len(colours) - 1)]
+        strip_colours.append(colour)
+        display(PIXELS, i, colour)
         PIXELS.show()
         time.sleep(period)
     return strip_colours
@@ -140,7 +140,7 @@ def recursive_merge_sort(
   start_index,
   end_index,
   period):
-    if (start_index == end_index):
+    if start_index == end_index:
         return [strip_colours[start_index]]
     else:
         num_leds = end_index - start_index + 1
@@ -156,7 +156,7 @@ def recursive_merge_sort(
         num_merged_left = len(merged_left)
         num_merged_right = len(merged_right)
         k = start_index
-        while (k <= end_index):
+        while k <= end_index:
             if i == num_merged_left:
                 strip_colours[k] = merged_right[j]
                 j += 1
@@ -178,7 +178,7 @@ def recursive_merge_sort(
         # the strip.
         merged_all = []
         i = start_index
-        while (i <= end_index):
+        while i <= end_index:
             merged_all.append(strip_colours[i])
             if PIXELS.get_pixel_rgb(i) != strip_colours[i]:
                 display(PIXELS, i, strip_colours[i])
@@ -213,7 +213,7 @@ def bubble_sort(
       strip_colours, num_celebration_flashes, celebration_period)
 
 
-def snow(duration, period, spawn_rate, dim_factor):
+def snow(duration, period, spawn_rate):
     print("Starting snow!")
     start_time = time.time()
     PIXELS.clear()
@@ -224,7 +224,7 @@ def snow(duration, period, spawn_rate, dim_factor):
         num_snowflakes = len(snowflakes)
         for i in range(0, num_snowflakes):
             snowflake_pixel = snowflakes[i]
-            display(PIXELS, snowflake_pixel, Colour.BLACK)
+            display(PIXELS, snowflake_pixel, led_colour.BLACK)
             snowflakes[i] += 1
 
         if num_snowflakes > 0 and snowflakes[num_snowflakes - 1] >= PIXEL_COUNT:
@@ -235,13 +235,13 @@ def snow(duration, period, spawn_rate, dim_factor):
           0 not in snowflakes
           and 1 not in snowflakes
           and random.random() > 1 - spawn_rate)
-        if (new_snowflake):
+        if new_snowflake:
             snowflakes.insert(0, 0)
             num_snowflakes += 1
 
         for i in range(0, num_snowflakes):
             snowflake_pixel = snowflakes[i]
-            display(PIXELS, snowflake_pixel, Colour.WHITE)
+            display(PIXELS, snowflake_pixel, led_colour.WHITE)
         PIXELS.show()
         time.sleep(period)
 
@@ -319,41 +319,44 @@ def smoothbow(colours, period, increment, duration, interpolation_mode):
 algorithms = [
     lambda duration:
     stream(
-      [Colour.WHITE, Colour.RED, Colour.GREEN, Colour.GOLD],
+      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
       0.15,
       duration),
     lambda duration:
     stream(
-      [Colour.WHITE, Colour.RED, Colour.GREEN, Colour.BLUE],
+      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.BLUE],
       0.15,
       duration),
     lambda duration:
     stream(
-      [Colour.WHITE, Colour.RED, Colour.GREEN, Colour.BLUE, Colour.GOLD],
+      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.BLUE,
+       led_colour.GOLD],
       0.15,
       duration),
-    lambda duration: stream([Colour.WHITE, Colour.RED], 0.25, duration),
-    lambda duration: stream([Colour.GREEN, Colour.RED], 0.25, duration),
-    lambda duration: stream([Colour.GOLD, Colour.RED], 0.25, duration),
-    lambda duration: stream([Colour.GREEN, Colour.WHITE], 0.25, duration),
+    lambda duration: stream([led_colour.WHITE, led_colour.RED], 0.25, duration),
+    lambda duration: stream([led_colour.GREEN, led_colour.RED], 0.25, duration),
+    lambda duration: stream([led_colour.GOLD, led_colour.RED], 0.25, duration),
+    lambda duration: stream([led_colour.GREEN, led_colour.WHITE], 0.25,
+      duration),
     lambda duration:
     merge_sort(
-      [Colour.WHITE, Colour.RED, Colour.GREEN, Colour.GOLD],
+      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
       0.05,
       0.08,
       1.5,
       5),
     lambda duration:
     bubble_sort(
-      [Colour.WHITE, Colour.RED, Colour.GREEN, Colour.GOLD],
+      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
       0.05,
       0.02,
       1.5,
       5),
-    lambda duration: snow(duration, 0.2, 0.1, 0.05),
+    lambda duration: snow(duration, 0.2, 0.1),
     lambda duration:
     smoothbow(
-      [Colour.WHITE.multiply(0.25), Colour.RED, Colour.GOLD, Colour.GREEN],
+      [led_colour.WHITE.multiply(0.25), led_colour.RED, led_colour.GOLD,
+       led_colour.GREEN],
       0,
       0.25,
       duration,
@@ -364,7 +367,7 @@ algorithms = [
 PIXELS.clear()
 PIXELS.show()  # Make sure to call show() after changing any pixels!
 
-while (True):
+while True:
     algorithms[random.randint(0, len(algorithms) - 1)](random.randint(20, 40))
 
 # Not used but you can also read pixel colors with the get_pixel_rgb function:
