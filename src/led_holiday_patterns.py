@@ -1,5 +1,8 @@
-# Animates random patterns on a WS2801 LED strip with traditional holiday
-# colours.
+"""Animates random patterns on a WS2801 LED strip with traditional holiday
+colours.
+"""
+
+import random
 
 from colour import led_colour
 from colour.cubic_interpolation import CubicInterpolation
@@ -37,17 +40,24 @@ binary_colour_stream_pattern = StreamPattern(30, 4, NoInterpolation())
 smooth_stream_pattern = StreamPattern(30, 10, CubicInterpolation())
 
 patterns = [
+    # Multi-colour stream patterns.
     lambda:
     multi_colour_stream_pattern.animate(
       leds,
-      stream_pattern.create_colour_cycle(
-        [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
+      stream_pattern.create_colour_cycle([
+          led_colour.WHITE,
+          led_colour.RED,
+          led_colour.GREEN,
+          led_colour.GOLD],
         leds.num_leds)),
     lambda:
     multi_colour_stream_pattern.animate(
       leds,
-      stream_pattern.create_colour_cycle(
-        [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.BLUE],
+      stream_pattern.create_colour_cycle([
+          led_colour.WHITE,
+          led_colour.RED,
+          led_colour.GREEN,
+          led_colour.BLUE],
         leds.num_leds)),
     lambda:
     multi_colour_stream_pattern.animate(
@@ -59,22 +69,33 @@ patterns = [
           led_colour.BLUE,
           led_colour.GOLD],
         leds.num_leds)),
+    # Binary colour stream patterns.
     lambda: binary_colour_stream_pattern.animate(
       leds,
-      stream_pattern.create_colour_cycle([led_colour.WHITE, led_colour.RED],
+      stream_pattern.create_colour_cycle(
+        [led_colour.WHITE, led_colour.RED],
         leds.num_leds)),
     lambda: binary_colour_stream_pattern.animate(
       leds,
-      stream_pattern.create_colour_cycle([led_colour.GREEN, led_colour.RED],
+      stream_pattern.create_colour_cycle(
+        [led_colour.GREEN, led_colour.RED],
         leds.num_leds)),
     lambda: binary_colour_stream_pattern.animate(
       leds,
-      stream_pattern.create_colour_cycle([led_colour.GOLD, led_colour.RED],
+      stream_pattern.create_colour_cycle(
+        [led_colour.GOLD, led_colour.RED],
         leds.num_leds)),
     lambda: binary_colour_stream_pattern.animate(
       leds,
-      stream_pattern.create_colour_cycle([led_colour.GREEN, led_colour.WHITE],
+      stream_pattern.create_colour_cycle(
+        [led_colour.GREEN, led_colour.WHITE],
         leds.num_leds)),
+    # Smooth stream patterns.
+    lambda:
+    smooth_stream_pattern.animate(
+      leds,
+      [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN]),
+    # Sort patterns.
     lambda: merge_sort_pattern.animate(
       leds,
       [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD]),
@@ -82,17 +103,9 @@ patterns = [
       leds,
       [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD]),
     lambda: snow_pattern.animate(leds, [led_colour.WHITE]),
-    lambda:
-    smooth_stream_pattern.animate(
-      leds,
-      [led_colour.WHITE, led_colour.RED, led_colour.GOLD,
-          led_colour.GREEN])
 ]
 
 leds.clear()
 
-for pattern in patterns:
-    pattern()
-
-# while True:
-#     algorithms[random.randint(0, len(algorithms) - 1)](random.randint(20, 40))
+while True:
+    patterns[random.randint(0, len(patterns) - 1)]()
