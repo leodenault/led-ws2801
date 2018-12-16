@@ -6,6 +6,7 @@ import random
 
 from colour import led_colour
 from colour.cubic_interpolation import CubicInterpolation
+from colour.linear_interpolation import LinearInterpolation
 from colour.no_interpolation import NoInterpolation
 from led_strip.led_strip import LedDirection
 from led_strip.led_strip import LedStrip
@@ -38,6 +39,7 @@ merge_sort_pattern = MergeSortPattern(
 multi_colour_stream_pattern = StreamPattern(30, 6, NoInterpolation())
 binary_colour_stream_pattern = StreamPattern(30, 4, NoInterpolation())
 smooth_stream_pattern = StreamPattern(30, 10, CubicInterpolation())
+phasing_stream_pattern = StreamPattern(30, 0.25, LinearInterpolation())
 
 patterns = [
     # Multi-colour stream patterns.
@@ -95,6 +97,13 @@ patterns = [
     smooth_stream_pattern.animate(
       leds,
       [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN]),
+    # Phasing stream patterns.
+    lambda:
+    phasing_stream_pattern.animate(
+      leds,
+      stream_pattern.create_colour_cycle(
+        [led_colour.RED, led_colour.GREEN, led_colour.BLUE],
+        leds.num_leds)),
     # Sort patterns.
     lambda: merge_sort_pattern.animate(
       leds,
@@ -109,3 +118,4 @@ leds.clear()
 
 while True:
     patterns[random.randint(0, len(patterns) - 1)]()
+    
