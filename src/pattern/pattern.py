@@ -10,11 +10,12 @@ class Pattern:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def animate(self, leds, colours):
+    def animate(self, leds, colour_palette):
         """Animates a particular pattern on a strip of LEDs.
         :param leds: an LedStrip reference for sending commands to the
         physical LED strip.
-        :param colours: the set of colours which should be used to animate
+        :param colour_palette: the set of colours which should be used to
+        animate
         the pattern.
         """
         print("Starting {0}!".format(self.__class__.__name__))

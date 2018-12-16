@@ -23,8 +23,8 @@ class SnowPattern(Pattern):
         self.spawn_rate = spawn_rate
         self.movement_period = movement_period
 
-    def animate(self, leds, colours):
-        super(SnowPattern, self).animate(leds, colours)
+    def animate(self, leds, colour_palette):
+        super(SnowPattern, self).animate(leds, colour_palette)
         start_time = time.time()
         leds.clear()
         snowflakes = []
@@ -52,7 +52,7 @@ class SnowPattern(Pattern):
             for i in range(0, num_snowflakes):
                 snowflake_pixel = snowflakes[i]
                 leds.set_colour(
-                  led_colour.WHITE if len(colours) == 0 else colours[0],
+                  led_colour.WHITE if len(colour_palette) == 0 else colour_palette[0],
                   snowflake_pixel)
             leds.display()
             time.sleep(self.movement_period)

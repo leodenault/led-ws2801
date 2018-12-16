@@ -10,13 +10,15 @@ from led_strip.led_strip import LedDirection
 from led_strip.led_strip import LedStrip
 from led_strip.regular_brightness_schedule import RegularBrightnessSchedule
 from pattern.snow_pattern import SnowPattern
+from pattern.sorting.bubble_sort_pattern import BubbleSortPattern
+from pattern.sorting.merge_sort_pattern import MergeSortPattern
+from pattern.sorting.colour_distributor import ColourDistributor
+from pattern.sorting.sort_celebration import SortCelebration
 
-strip = LedStrip(86, RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
+strip = LedStrip(
+  86,
+  RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
   LedDirection.END_TO_START)
-
-
-def compare(colour1, colour2, colours):
-    return colours.index(colour1) < colours.index(colour2)
 
 
 def stream(colours, period, duration):
@@ -34,127 +36,6 @@ def stream(colours, period, duration):
         strip.display()
         shift = (shift + 1) % num_colours
         time.sleep(period)
-
-
-def assign_random_leds(colours, period):
-    # Create a random array of colours the length of the strip.
-    strip_colours = []
-    for i in range(0, strip.num_leds):
-        colour = colours[random.randint(0, len(colours) - 1)]
-        strip_colours.append(colour)
-        strip.set_colour_and_display(colour, i)
-        time.sleep(period)
-    return strip_colours
-
-
-def celebrate_sort_success(
-  strip_colours,
-  num_celebration_flashes,
-  celebration_period):
-    strength_per_second = 2.0 / celebration_period
-    for flash_index in range(0, num_celebration_flashes):
-        strength = -1.0
-        while strength < 1.0:
-            start_time = time.time()
-            for colour_index in range(0, len(strip_colours)):
-                strip.set_colour(
-                  strip_colours[colour_index].multiply(abs(strength)),
-                  colour_index)
-            strip.display()
-            elapsed_time = time.time() - start_time
-            strength += elapsed_time * strength_per_second
-
-
-def merge_sort(
-  colours,
-  assignment_period,
-  sort_period,
-  celebration_period,
-  num_celebration_flashes):
-    print("Starting merge sort!")
-    strip_colours = assign_random_leds(colours, assignment_period)
-    recursive_merge_sort(
-      colours, strip_colours, 0, len(strip_colours) - 1, sort_period)
-    celebrate_sort_success(
-      strip_colours, num_celebration_flashes, celebration_period)
-
-
-def recursive_merge_sort(
-  colours,
-  strip_colours,
-  start_index,
-  end_index,
-  period):
-    if start_index == end_index:
-        return [strip_colours[start_index]]
-    else:
-        num_leds = end_index - start_index + 1
-        middle = start_index + num_leds / 2
-        merged_left = recursive_merge_sort(
-          colours, strip_colours, start_index, middle - 1, period)
-        merged_right = recursive_merge_sort(
-          colours, strip_colours, middle, end_index, period)
-
-        # Merge both sides together.
-        i = 0
-        j = 0
-        num_merged_left = len(merged_left)
-        num_merged_right = len(merged_right)
-        k = start_index
-        while k <= end_index:
-            if i == num_merged_left:
-                strip_colours[k] = merged_right[j]
-                j += 1
-            elif j == num_merged_right:
-                strip_colours[k] = merged_left[i]
-                i += 1
-            else:
-                from_left = compare(merged_left[i], merged_right[j], colours)
-                if from_left:
-                    strip_colours[k] = merged_left[i]
-                    i += 1
-                else:
-                    strip_colours[k] = merged_right[j]
-                    j += 1
-            k += 1
-
-        # Create temporary array with newly merged set and display the
-        # colours to
-        # the strip.
-        merged_all = []
-        i = start_index
-        while i <= end_index:
-            merged_all.append(strip_colours[i])
-            if strip.get_colour_at(i) != strip_colours[i]:
-                strip.set_colour_and_display(strip_colours[i], i)
-                time.sleep(period)
-            i += 1
-        return merged_all
-
-
-def bubble_sort(
-  colours,
-  assignment_period,
-  sort_period,
-  celebration_period,
-  num_celebration_flashes):
-    print("Starting bubble sort!")
-    strip_colours = assign_random_leds(colours, assignment_period)
-    colours_sorted = False
-    while not colours_sorted:
-        colours_sorted = True
-        for i in range(0, len(strip_colours) - 1):
-            if compare(strip_colours[i + 1], strip_colours[i], colours):
-                left = strip_colours[i]
-                strip_colours[i] = strip_colours[i + 1]
-                strip_colours[i + 1] = left
-                strip.set_colour(strip_colours[i], i)
-                strip.set_colour(strip_colours[i + 1], i + 1)
-                strip.display()
-                time.sleep(sort_period)
-                colours_sorted = False
-    celebrate_sort_success(
-      strip_colours, num_celebration_flashes, celebration_period)
 
 
 def distance_to_colour(index, colour_position, moving_right):
@@ -207,7 +88,18 @@ def smoothbow(colours, period, increment, duration, interpolation_mode):
         time.sleep(period)
 
 
+colour_distributor = ColourDistributor(5)
+sort_celebration = SortCelebration(5, 1.5)
+
 snow_pattern = SnowPattern(30, 0.1, 0.2)
+bubble_sort_pattern = BubbleSortPattern(
+  colour_distributor,
+  sort_celebration,
+  0.02)
+merge_sort_pattern = MergeSortPattern(
+  colour_distributor,
+  sort_celebration,
+  0.08)
 
 # Start up the app.
 algorithms = [
@@ -232,20 +124,12 @@ algorithms = [
     lambda duration: stream([led_colour.GOLD, led_colour.RED], 0.25, duration),
     lambda duration: stream([led_colour.GREEN, led_colour.WHITE], 0.25,
       duration),
-    lambda duration:
-    merge_sort(
-      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
-      0.05,
-      0.08,
-      1.5,
-      5),
-    lambda duration:
-    bubble_sort(
-      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
-      0.05,
-      0.02,
-      1.5,
-      5),
+    lambda duration: merge_sort_pattern.animate(
+      strip,
+      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD]),
+    lambda duration: bubble_sort_pattern.animate(
+      strip,
+      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD]),
     lambda duration: snow_pattern.animate(strip, [led_colour.WHITE]),
     lambda duration:
     smoothbow(
