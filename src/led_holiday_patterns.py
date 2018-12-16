@@ -10,7 +10,7 @@ from led_strip.led_strip import LedStrip
 from led_strip.regular_brightness_schedule import RegularBrightnessSchedule
 from led_strip.led_strip import LedDirection
 
-strip = LedStrip(86, RegularBrightnessSchedule(7, 9, 4, 9, 0.1, 1.0),
+strip = LedStrip(86, RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
   LedDirection.END_TO_START)
 
 

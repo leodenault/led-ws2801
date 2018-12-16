@@ -63,8 +63,8 @@ class LedStrip:
         unspecified, then colour is displayed on all LEDs.
         """
 
-        displayed_colour = colour.multiply(
-          self.brightness_schedule.get_brightness())
+        brightness = self.brightness_schedule.get_brightness()
+        displayed_colour = colour.multiply(brightness)
 
         if led == LedStrip._ALL_LEDS:
             for i in range(0, self.num_leds):

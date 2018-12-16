@@ -1,5 +1,6 @@
-from brightness_schedule import BrightnessSchedule
 from datetime import datetime
+
+from brightness_schedule import BrightnessSchedule
 
 
 class RegularBrightnessSchedule(BrightnessSchedule):
@@ -26,7 +27,7 @@ class RegularBrightnessSchedule(BrightnessSchedule):
         self.ramp_up_duration_minutes = (
                                           self.ramp_up_hour_end -
                                           ramp_up_hour_start) * 60
-        self.ramp_down_mitnue_start = ramp_down_hour_start * 60
+        self.ramp_down_minute_start = ramp_down_hour_start * 60
         self.ramp_down_duration_minutes = (
                                             ramp_down_hour_end -
                                             ramp_down_hour_start) * 60
@@ -52,6 +53,6 @@ class RegularBrightnessSchedule(BrightnessSchedule):
 
         completion = (
           (
-            minute_of_day - self.ramp_down_mitnue_start) /
+            minute_of_day - self.ramp_down_minute_start) /
           self.ramp_down_duration_minutes)
         return (1 - completion) * self.brightness_delta + self.min_brightness
