@@ -6,9 +6,10 @@ import time
 
 from colour import led_colour
 from colour.cubic_interpolation import CubicInterpolation
+from led_strip.led_strip import LedDirection
 from led_strip.led_strip import LedStrip
 from led_strip.regular_brightness_schedule import RegularBrightnessSchedule
-from led_strip.led_strip import LedDirection
+from pattern.snow_pattern import SnowPattern
 
 strip = LedStrip(86, RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
   LedDirection.END_TO_START)
@@ -156,39 +157,6 @@ def bubble_sort(
       strip_colours, num_celebration_flashes, celebration_period)
 
 
-def snow(duration, period, spawn_rate):
-    print("Starting snow!")
-    start_time = time.time()
-    strip.clear()
-    snowflakes = []
-
-    while time.time() - start_time < duration:
-        num_snowflakes = len(snowflakes)
-        for i in range(0, num_snowflakes):
-            snowflake_pixel = snowflakes[i]
-            strip.set_colour(led_colour.BLACK, snowflake_pixel)
-            snowflakes[i] += 1
-
-        if (num_snowflakes > 0
-          and snowflakes[num_snowflakes - 1] >= strip.num_leds):
-            snowflakes.pop(num_snowflakes - 1)
-            num_snowflakes -= 1
-
-        new_snowflake = (
-          0 not in snowflakes
-          and 1 not in snowflakes
-          and random.random() > 1 - spawn_rate)
-        if new_snowflake:
-            snowflakes.insert(0, 0)
-            num_snowflakes += 1
-
-        for i in range(0, num_snowflakes):
-            snowflake_pixel = snowflakes[i]
-            strip.set_colour(led_colour.WHITE, snowflake_pixel)
-        strip.display()
-        time.sleep(period)
-
-
 def distance_to_colour(index, colour_position, moving_right):
     distance = (
         colour_position - index if moving_right else index - colour_position)
@@ -239,6 +207,8 @@ def smoothbow(colours, period, increment, duration, interpolation_mode):
         time.sleep(period)
 
 
+snow_pattern = SnowPattern(30, 0.1, 0.2)
+
 # Start up the app.
 algorithms = [
     lambda duration:
@@ -276,7 +246,7 @@ algorithms = [
       0.02,
       1.5,
       5),
-    lambda duration: snow(duration, 0.2, 0.1),
+    lambda duration: snow_pattern.animate(strip, [led_colour.WHITE]),
     lambda duration:
     smoothbow(
       [led_colour.WHITE.multiply(0.25), led_colour.RED, led_colour.GOLD,
