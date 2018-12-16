@@ -26,7 +26,8 @@ class ColourDistributor:
         in the form of an array.
         """
         strip_data = []
-        led_assignment_duration = self.distribution_duration / leds.num_leds
+        led_assignment_duration = (
+              float(self.distribution_duration) / leds.num_leds)
         for i in range(0, leds.num_leds):
             colour = colour_palette[random.randint(0, len(colour_palette) - 1)]
             strip_data.append(colour)
