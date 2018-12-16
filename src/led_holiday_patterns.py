@@ -3,64 +3,15 @@
 
 import random
 import time
-from datetime import datetime
-
-import Adafruit_GPIO.SPI as SPI
-import Adafruit_WS2801
 
 from colour import led_colour
 from colour.cubic_interpolation import CubicInterpolation
+from led_strip.led_strip import LedStrip
+from led_strip.regular_brightness_schedule import RegularBrightnessSchedule
+from led_strip.led_strip import LedDirection
 
-# Configure the count of pixels:
-PIXEL_COUNT = 86
-
-# Configure whether the LEDs should iterate from start-to-end or vice-versa.
-START_TO_END = False
-
-# Specify a hardware SPI connection on /dev/spidev0.0:
-SPI_PORT = 0
-SPI_DEVICE = 0
-PIXELS = Adafruit_WS2801.WS2801Pixels(
-  PIXEL_COUNT, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
-
-# Brightness adjustment by time of day.
-RAMP_UP_HOUR_START = 7
-RAMP_UP_MINUTE_START = RAMP_UP_HOUR_START * 60
-RAMP_UP_HOUR_END = 9
-RAMP_UP_DURATION_MINUTES = (RAMP_UP_HOUR_END - RAMP_UP_HOUR_START) * 60
-RAMP_DOWN_HOUR_START = 16
-RAMP_DOWN_MINUTE_START = RAMP_DOWN_HOUR_START * 60
-RAMP_DOWN_HOUR_END = 21
-RAMP_DOWN_DURATION_MINUTES = (RAMP_DOWN_HOUR_END - RAMP_DOWN_HOUR_START) * 60
-MAX_BRIGHTNESS = 1.0
-MIN_BRIGHTNESS = 0.1
-BRIGHTNESS_DELTA = MAX_BRIGHTNESS - MIN_BRIGHTNESS
-
-
-# Breaks if the ramp up or down times cross a daily border.
-def brightness_factor():
-    current_time = datetime.now().time()
-    current_hour = current_time.hour
-    if current_hour < RAMP_UP_HOUR_START or current_hour >= RAMP_DOWN_HOUR_END:
-        return MIN_BRIGHTNESS
-    if RAMP_UP_HOUR_END <= current_hour < RAMP_DOWN_HOUR_START:
-        return MAX_BRIGHTNESS
-
-    minute_of_day = current_hour * 60.0 + current_time.minute
-    if current_hour < RAMP_UP_HOUR_END:
-        completion = (
-          (minute_of_day - RAMP_UP_MINUTE_START) / RAMP_UP_DURATION_MINUTES)
-        return completion * BRIGHTNESS_DELTA + MIN_BRIGHTNESS
-
-    completion = (
-      (minute_of_day - RAMP_DOWN_MINUTE_START) / RAMP_DOWN_DURATION_MINUTES)
-    return (1 - completion) * BRIGHTNESS_DELTA + MIN_BRIGHTNESS
-
-
-def display(pixels, led, colour):
-    led = led if START_TO_END else PIXEL_COUNT - led - 1
-    dimmed_colour = colour.multiply(brightness_factor())
-    pixels.set_pixel_rgb(led, dimmed_colour.r, dimmed_colour.g, dimmed_colour.b)
+strip = LedStrip(86, RegularBrightnessSchedule(7, 9, 4, 9, 0.1, 1.0),
+  LedDirection.END_TO_START)
 
 
 def compare(colour1, colour2, colours):
@@ -75,11 +26,11 @@ def stream(colours, period, duration):
     num_colours = len(colours)
     start_time = time.time()
     while time.time() - start_time < duration:
-        for i in range(PIXEL_COUNT):
+        for i in range(strip.num_leds):
             colour_index = i % num_colours
             shifted_colour = (colour_index + shift) % num_colours
-            display(PIXELS, i, colours[shifted_colour])
-        PIXELS.show()
+            strip.set_colour(colours[shifted_colour], i)
+        strip.display()
         shift = (shift + 1) % num_colours
         time.sleep(period)
 
@@ -87,11 +38,10 @@ def stream(colours, period, duration):
 def assign_random_leds(colours, period):
     # Create a random array of colours the length of the strip.
     strip_colours = []
-    for i in range(0, PIXEL_COUNT):
+    for i in range(0, strip.num_leds):
         colour = colours[random.randint(0, len(colours) - 1)]
         strip_colours.append(colour)
-        display(PIXELS, i, colour)
-        PIXELS.show()
+        strip.set_colour_and_display(colour, i)
         time.sleep(period)
     return strip_colours
 
@@ -106,11 +56,10 @@ def celebrate_sort_success(
         while strength < 1.0:
             start_time = time.time()
             for colour_index in range(0, len(strip_colours)):
-                display(
-                  PIXELS,
-                  colour_index,
-                  strip_colours[colour_index].multiply(abs(strength)))
-            PIXELS.show()
+                strip.set_colour(
+                  strip_colours[colour_index].multiply(abs(strength)),
+                  colour_index)
+            strip.display()
             elapsed_time = time.time() - start_time
             strength += elapsed_time * strength_per_second
 
@@ -175,9 +124,8 @@ def recursive_merge_sort(
         i = start_index
         while i <= end_index:
             merged_all.append(strip_colours[i])
-            if PIXELS.get_pixel_rgb(i) != strip_colours[i]:
-                display(PIXELS, i, strip_colours[i])
-                PIXELS.show()
+            if strip.get_colour_at(i) != strip_colours[i]:
+                strip.set_colour_and_display(strip_colours[i], i)
                 time.sleep(period)
             i += 1
         return merged_all
@@ -199,9 +147,9 @@ def bubble_sort(
                 left = strip_colours[i]
                 strip_colours[i] = strip_colours[i + 1]
                 strip_colours[i + 1] = left
-                display(PIXELS, i, strip_colours[i])
-                display(PIXELS, i + 1, strip_colours[i + 1])
-                PIXELS.show()
+                strip.set_colour(strip_colours[i], i)
+                strip.set_colour(strip_colours[i + 1], i + 1)
+                strip.display()
                 time.sleep(sort_period)
                 colours_sorted = False
     celebrate_sort_success(
@@ -211,18 +159,18 @@ def bubble_sort(
 def snow(duration, period, spawn_rate):
     print("Starting snow!")
     start_time = time.time()
-    PIXELS.clear()
-    PIXELS.show()
+    strip.clear()
     snowflakes = []
 
     while time.time() - start_time < duration:
         num_snowflakes = len(snowflakes)
         for i in range(0, num_snowflakes):
             snowflake_pixel = snowflakes[i]
-            display(PIXELS, snowflake_pixel, led_colour.BLACK)
+            strip.set_colour(led_colour.BLACK, snowflake_pixel)
             snowflakes[i] += 1
 
-        if num_snowflakes > 0 and snowflakes[num_snowflakes - 1] >= PIXEL_COUNT:
+        if (num_snowflakes > 0
+          and snowflakes[num_snowflakes - 1] >= strip.num_leds):
             snowflakes.pop(num_snowflakes - 1)
             num_snowflakes -= 1
 
@@ -236,8 +184,8 @@ def snow(duration, period, spawn_rate):
 
         for i in range(0, num_snowflakes):
             snowflake_pixel = snowflakes[i]
-            display(PIXELS, snowflake_pixel, led_colour.WHITE)
-        PIXELS.show()
+            strip.set_colour(led_colour.WHITE, snowflake_pixel)
+        strip.display()
         time.sleep(period)
 
 
@@ -245,21 +193,21 @@ def distance_to_colour(index, colour_position, moving_right):
     distance = (
         colour_position - index if moving_right else index - colour_position)
     if distance < 0:
-        distance = PIXEL_COUNT + distance
+        distance = strip.num_leds + distance
     return distance
 
 
 def smoothbow(colours, period, increment, duration, interpolation_mode):
     print("Starting smoothbow!")
     num_segments = len(colours)
-    segment_length = PIXEL_COUNT / float(num_segments)
+    segment_length = strip.num_leds / float(num_segments)
     colour_positions = {}
     for i in range(0, num_segments):
         colour_positions[colours[i]] = i * segment_length
 
     start_time = time.time()
     while time.time() - start_time < duration:
-        for i in range(0, PIXEL_COUNT):
+        for i in range(0, strip.num_leds):
             nearest_colours = []
             for j in range(0, num_segments):
                 right_distance = distance_to_colour(
@@ -274,23 +222,20 @@ def smoothbow(colours, period, increment, duration, interpolation_mode):
             # At this point there should be at most 2 colours.
             num_nearest_colours = len(nearest_colours)
             if num_nearest_colours == 1:
-                display(PIXELS, i, nearest_colours[0][0])
+                strip.set_colour(nearest_colours[0][0], i)
             elif num_nearest_colours == 2:
-                display(
-                  PIXELS,
-                  i,
-                  interpolation_mode.interpolate(
-                    nearest_colours[0][0],
-                    nearest_colours[1][0],
-                    1 - (nearest_colours[0][1] / segment_length)))
+                strip.set_colour(interpolation_mode.interpolate(
+                  nearest_colours[0][0],
+                  nearest_colours[1][0],
+                  1 - (nearest_colours[0][1] / segment_length)), i)
             else:
                 print("Detected {0} nearest colours. Expected 1 or 2."
                       .format(num_nearest_colours))
 
         for i in range(0, num_segments):
             colour_positions[colours[i]] = (
-              (colour_positions[colours[i]] + increment) % PIXEL_COUNT)
-        PIXELS.show()
+              (colour_positions[colours[i]] + increment) % strip.num_leds)
+        strip.display()
         time.sleep(period)
 
 
@@ -309,7 +254,7 @@ algorithms = [
     lambda duration:
     stream(
       [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.BLUE,
-       led_colour.GOLD],
+          led_colour.GOLD],
       0.15,
       duration),
     lambda duration: stream([led_colour.WHITE, led_colour.RED], 0.25, duration),
@@ -335,7 +280,7 @@ algorithms = [
     lambda duration:
     smoothbow(
       [led_colour.WHITE.multiply(0.25), led_colour.RED, led_colour.GOLD,
-       led_colour.GREEN],
+          led_colour.GREEN],
       0,
       0.25,
       duration,
@@ -343,8 +288,7 @@ algorithms = [
 ]
 
 # Clear all the pixels to turn them off.
-PIXELS.clear()
-PIXELS.show()  # Make sure to call show() after changing any pixels!
+strip.clear()
 
 while True:
     algorithms[random.randint(0, len(algorithms) - 1)](random.randint(20, 40))

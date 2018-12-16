@@ -29,6 +29,7 @@ class LedStrip:
     def __init__(
       self,
       num_leds,
+      brightness_schedule,
       direction=LedDirection.START_TO_END,
       spi_port=0,
       spi_device=0):
@@ -36,7 +37,9 @@ class LedStrip:
         connected to the Raspberry Pi.
         
         :param num_leds: the number of LEDs on the strip.
-        :param direction: the direction in which animations should be 
+        :param brightness_schedule: the BrightnessSchedule object configuring
+        how bright the LEDs should be depending on the time of day.
+        :param direction: the direction in which animations should be
         rendered. Use LedDirection.START_TO_END to output patterns so that 
         the first pixel in the pattern matches with the first physical LED on 
         the strip. Use LedDirection.END_TO_START to output patterns so that 
@@ -48,23 +51,45 @@ class LedStrip:
         """
         self.leds = Adafruit_WS2801.WS2801Pixels(
           num_leds, spi=SPI.SpiDev(spi_port, spi_device))
+        self.brightness_schedule = brightness_schedule
         self.direction = direction
         self.num_leds = num_leds
 
-    def display(self, colour, led=_ALL_LEDS):
-        """Displays a specific colour on a specific LED.
+    def set_colour(self, colour, led=_ALL_LEDS):
+        """Sets the colour of one or all LEDs on a strip.
 
         :param colour: the colour to output to the LED.
         :param led: the index of the LED to output the colour to. If
         unspecified, then colour is displayed on all LEDs.
         """
 
+        displayed_colour = colour.multiply(
+          self.brightness_schedule.get_brightness())
+
         if led == LedStrip._ALL_LEDS:
             for i in range(0, self.num_leds):
-                self.leds.set_pixel_rgb(i, colour.r, colour.g, colour.b)
+                self.leds.set_pixel_rgb(i, displayed_colour.r,
+                  displayed_colour.g, displayed_colour.b)
         else:
-            led = led if self.direction else self.num_leds - led - 1
-            self.leds.set_pixel_rgb(led, colour.r, colour.g, colour.b)
+            self.leds.set_pixel_rgb(
+              self._fetch_physical_index(led),
+              displayed_colour.r,
+              displayed_colour.g,
+              displayed_colour.b)
+
+    def set_colour_and_display(self, colour, led=_ALL_LEDS):
+        """Sets the colour of one or all LEDs on a strip and then displays it.
+
+        :param colour: the colour to output to the LED.
+        :param led: the index of the LED to output the colour to. If
+        unspecified, then colour is displayed on all LEDs.
+        """
+        self.set_colour(colour, led)
+        self.leds.show()
+
+    def display(self):
+        """Displays the colours currently assigned to the LEDs.
+        """
         self.leds.show()
 
     def clear(self):
@@ -73,3 +98,13 @@ class LedStrip:
 
         self.leds.clear()
         self.leds.show()
+
+    def get_colour_at(self, index):
+        """Returns the colour at the provided logical index.
+        """
+        return self.leds.get_pixel_rgb(self._fetch_physical_index(index))
+
+    def _fetch_physical_index(self, logical_index):
+        return (
+            logical_index if self.direction == LedDirection.START_TO_END else
+            self.num_leds - logical_index - 1)
