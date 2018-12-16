@@ -37,12 +37,6 @@ MIN_BRIGHTNESS = 0.1
 BRIGHTNESS_DELTA = MAX_BRIGHTNESS - MIN_BRIGHTNESS
 
 
-class InterpolationMode:
-    LINEAR = 1
-    QUADRATIC = 2
-    CUBIC = 3
-
-
 # Breaks if the ramp up or down times cross a daily border.
 def brightness_factor():
     current_time = datetime.now().time()
@@ -253,20 +247,6 @@ def distance_to_colour(index, colour_position, moving_right):
     if distance < 0:
         distance = PIXEL_COUNT + distance
     return distance
-
-
-# def interpolate(colour1, colour2, distance_to_colour1, segment_length, mode):
-#     factor1 = 1 - (distance_to_colour1 / segment_length)
-#     factor2 = 1 - factor1
-#
-#     if mode == InterpolationMode.QUADRATIC:
-#         factor1 *= factor1
-#         factor2 *= factor2
-#     if mode == InterpolationMode.CUBIC:
-#         factor1 *= factor1 * factor1
-#         factor2 *= factor2 * factor2
-#
-#     return colour1.multiply(factor1).add(colour2.multiply(factor2))
 
 
 def smoothbow(colours, period, increment, duration, interpolation_mode):
