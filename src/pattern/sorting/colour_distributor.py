@@ -27,10 +27,42 @@ class ColourDistributor:
         """
         strip_data = []
         led_assignment_duration = (
-              float(self.distribution_duration) / leds.num_leds)
-        for i in range(0, leds.num_leds):
-            colour = colour_palette[random.randint(0, len(colour_palette) - 1)]
-            strip_data.append(colour)
-            leds.set_colour_and_display(colour, i)
-            time.sleep(led_assignment_duration)
+          float(self.distribution_duration) / leds.num_leds)
+        initial_colours = [c for c in colour_palette]
+
+        i = 0
+        while len(initial_colours) > 0:
+            colour_index = random.randint(0, len(initial_colours) - 1)
+            _assign_random_colour(
+              leds,
+              strip_data,
+              i,
+              initial_colours,
+              colour_index,
+              led_assignment_duration)
+            initial_colours.pop(colour_index)
+            i += 1
+
+        for i in range(i, leds.num_leds):
+            colour_index = random.randint(0, len(colour_palette) - 1)
+            _assign_random_colour(
+              leds,
+              strip_data,
+              i,
+              colour_palette,
+              colour_index,
+              led_assignment_duration)
         return strip_data
+
+
+def _assign_random_colour(
+  leds,
+  strip_data,
+  strip_data_index,
+  colour_palette,
+  colour_index,
+  led_assignment_duration):
+    colour = colour_palette[colour_index]
+    strip_data.append(colour)
+    leds.set_colour_and_display(colour, strip_data_index)
+    time.sleep(led_assignment_duration)

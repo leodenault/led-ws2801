@@ -5,9 +5,11 @@ colours.
 import random
 
 from colour import led_colour
+from colour import palette
 from colour.cubic_interpolation import CubicInterpolation
 from colour.linear_interpolation import LinearInterpolation
 from colour.no_interpolation import NoInterpolation
+from colour.quadratic_interpolation import QuadraticInterpolation
 from led_strip.led_strip import LedDirection
 from led_strip.led_strip import LedStrip
 from led_strip.regular_brightness_schedule import RegularBrightnessSchedule
@@ -18,6 +20,21 @@ from pattern.sorting.colour_distributor import ColourDistributor
 from pattern.sorting.merge_sort_pattern import MergeSortPattern
 from pattern.sorting.sort_celebration import SortCelebration
 from pattern.stream_pattern import StreamPattern
+
+
+def _generate_sort_palette(sort_pattern):
+    candidates = palette.choose_random_from(
+      [led_colour.WHITE, led_colour.GREEN, led_colour.RED, led_colour.BLACK],
+      2,
+      2)
+    return sort_pattern.animate(
+      leds,
+      palette.gradient(
+        candidates[0],
+        candidates[1],
+        QuadraticInterpolation(),
+        leds.num_leds))
+
 
 leds = LedStrip(
   86,
@@ -42,62 +59,35 @@ smooth_stream_pattern = StreamPattern(30, 10, CubicInterpolation())
 phasing_stream_pattern = StreamPattern(30, 0.25, LinearInterpolation())
 
 patterns = [
-    # Multi-colour stream patterns.
+    # Multi-colour stream pattern.
     lambda:
     multi_colour_stream_pattern.animate(
       leds,
-      stream_pattern.create_colour_cycle([
-          led_colour.WHITE,
-          led_colour.RED,
-          led_colour.GREEN,
-          led_colour.GOLD],
+      stream_pattern.create_colour_cycle(
+        palette.choose_random_from([
+            led_colour.WHITE,
+            led_colour.RED,
+            led_colour.GREEN,
+            led_colour.BLUE,
+            led_colour.GOLD],
+          4,
+          5),
         leds.num_leds)),
-    lambda:
-    multi_colour_stream_pattern.animate(
-      leds,
-      stream_pattern.create_colour_cycle([
-          led_colour.WHITE,
-          led_colour.RED,
-          led_colour.GREEN,
-          led_colour.BLUE],
-        leds.num_leds)),
-    lambda:
-    multi_colour_stream_pattern.animate(
-      leds,
-      stream_pattern.create_colour_cycle([
-          led_colour.WHITE,
-          led_colour.RED,
-          led_colour.GREEN,
-          led_colour.BLUE,
-          led_colour.GOLD],
-        leds.num_leds)),
-    # Binary colour stream patterns.
+    # Binary colour stream pattern.
     lambda: binary_colour_stream_pattern.animate(
       leds,
       stream_pattern.create_colour_cycle(
-        [led_colour.WHITE, led_colour.RED],
+        palette.choose_random_from(
+          [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
+          2,
+          2),
         leds.num_leds)),
-    lambda: binary_colour_stream_pattern.animate(
-      leds,
-      stream_pattern.create_colour_cycle(
-        [led_colour.GREEN, led_colour.RED],
-        leds.num_leds)),
-    lambda: binary_colour_stream_pattern.animate(
-      leds,
-      stream_pattern.create_colour_cycle(
-        [led_colour.GOLD, led_colour.RED],
-        leds.num_leds)),
-    lambda: binary_colour_stream_pattern.animate(
-      leds,
-      stream_pattern.create_colour_cycle(
-        [led_colour.GREEN, led_colour.WHITE],
-        leds.num_leds)),
-    # Smooth stream patterns.
+    # Smooth stream pattern.
     lambda:
     smooth_stream_pattern.animate(
       leds,
       [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN]),
-    # Phasing stream patterns.
+    # Phasing stream pattern.
     lambda:
     phasing_stream_pattern.animate(
       leds,
@@ -105,12 +95,9 @@ patterns = [
         [led_colour.RED, led_colour.GREEN, led_colour.BLUE],
         leds.num_leds)),
     # Sort patterns.
-    lambda: merge_sort_pattern.animate(
-      leds,
-      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD]),
-    lambda: bubble_sort_pattern.animate(
-      leds,
-      [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD]),
+    lambda: _generate_sort_palette(merge_sort_pattern),
+    lambda: _generate_sort_palette(bubble_sort_pattern),
+    # Snow pattern.
     lambda: snow_pattern.animate(leds, [led_colour.WHITE]),
 ]
 
