@@ -34,55 +34,42 @@ class MergeSortPattern(SortPattern):
       start_index,
       end_index):
         if start_index == end_index:
-            return [strip_data[start_index]]
-        else:
-            num_leds = end_index - start_index + 1
-            middle = start_index + num_leds / 2
-            merged_left = self._recursive_merge_sort(
-              leds,
-              colour_palette,
-              strip_data,
-              start_index,
-              middle - 1)
-            merged_right = self._recursive_merge_sort(
-              leds,
-              colour_palette,
-              strip_data,
-              middle,
-              end_index)
+            return
 
-            # Merge both sides together.
-            i = 0
-            j = 0
-            num_merged_left = len(merged_left)
-            num_merged_right = len(merged_right)
-            k = start_index
-            while k <= end_index:
-                if i == num_merged_left:
-                    strip_data[k] = merged_right[j]
-                    j += 1
-                elif j == num_merged_right:
-                    strip_data[k] = merged_left[i]
-                    i += 1
-                else:
-                    from_left = compare(merged_left[i], merged_right[j],
-                      colour_palette)
-                    if from_left:
-                        strip_data[k] = merged_left[i]
-                        i += 1
-                    else:
-                        strip_data[k] = merged_right[j]
-                        j += 1
-                k += 1
+        num_leds = end_index - start_index + 1
+        middle = start_index + num_leds / 2
+        self._recursive_merge_sort(
+          leds,
+          colour_palette,
+          strip_data,
+          start_index,
+          middle - 1)
+        self._recursive_merge_sort(
+          leds,
+          colour_palette,
+          strip_data,
+          middle,
+          end_index)
 
-            # Create temporary array with newly merged set and display the
-            # colours to the strip.
-            merged_all = []
-            i = start_index
-            while i <= end_index:
-                merged_all.append(strip_data[i])
-                if leds.get_colour_at(i) != strip_data[i]:
-                    leds.set_colour_and_display(strip_data[i], i)
-                    time.sleep(self.sort_step_duration)
-                i += 1
-            return merged_all
+        # Merge both sides together.
+        while start_index <= end_index:
+            if middle > end_index or start_index == middle:
+                return
+            if (not compare(
+              strip_data[start_index],
+              strip_data[middle],
+              colour_palette)):
+                next_colour = strip_data[middle]
+                _shift_right(leds, strip_data, start_index, middle)
+                strip_data[start_index] = next_colour
+                leds.set_colour_and_display(
+                  strip_data[start_index], start_index)
+                time.sleep(self.sort_step_duration)
+                middle += 1
+            start_index += 1
+
+
+def _shift_right(leds, strip_data, start_index, end_index):
+    for i in range(end_index, start_index, -1):
+        strip_data[i] = strip_data[i - 1]
+        leds.set_colour(strip_data[i], i)

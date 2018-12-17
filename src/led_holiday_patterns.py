@@ -118,4 +118,3 @@ leds.clear()
 
 while True:
     patterns[random.randint(0, len(patterns) - 1)]()
-    
