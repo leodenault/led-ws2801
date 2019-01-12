@@ -10,9 +10,10 @@ from colour.cubic_interpolation import CubicInterpolation
 from colour.linear_interpolation import LinearInterpolation
 from colour.no_interpolation import NoInterpolation
 from colour.quadratic_interpolation import QuadraticInterpolation
-from led_strip.led_strip import LedDirection
-from led_strip.led_strip import LedStrip
-from led_strip.regular_brightness_schedule import RegularBrightnessSchedule
+from display.led_strip.led_strip import LedDirection
+from display.led_strip.led_strip import LedStrip
+from display.led_strip.regular_brightness_schedule import \
+    RegularBrightnessSchedule
 from pattern import stream_pattern
 from pattern.snow_pattern import SnowPattern
 from pattern.sorting.bubble_sort_pattern import BubbleSortPattern
