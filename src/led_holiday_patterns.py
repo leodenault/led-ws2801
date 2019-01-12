@@ -10,7 +10,7 @@ from colour.cubic_interpolation import CubicInterpolation
 from colour.linear_interpolation import LinearInterpolation
 from colour.no_interpolation import NoInterpolation
 from colour.quadratic_interpolation import QuadraticInterpolation
-from display.led_strip.led_strip import LedDirection
+from display.display import LedDirection
 from display.led_strip.led_strip import LedStrip
 from display.led_strip.regular_brightness_schedule import \
     RegularBrightnessSchedule

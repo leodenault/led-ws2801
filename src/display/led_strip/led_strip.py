@@ -1,25 +1,10 @@
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_WS2801
 
-
-class LedDirection:
-    """Enum class for defining directions to output light patterns on an LED
-    strip connected to a Raspberry Pi.
-    """
-
-    START_TO_END = 0
-    """Output patterns so that 
-        the first pixel in the pattern matches with the first physical LED on 
-        the strip.
-    """
-    END_TO_START = 1
-    """Output patterns so that 
-        the first pixel in the pattern matches with the last physical LED on 
-        the strip
-    """
+from display.display import Display, LedDirection
 
 
-class LedStrip:
+class LedStrip(Display):
     """Abstraction around a WS2801 LED strip connected to a Raspberry Pi
     through its GPIO pins and communicating through SPI.
     """
