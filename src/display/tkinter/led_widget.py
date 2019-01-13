@@ -13,11 +13,11 @@ class LedWidget:
         :param height: the height of thie widget.
         """
         self.widget = Frame(master)
-        self.widget["bg"] = "white"
+        self.widget["bg"] = "black"
+        self.widget["highlightbackground"] = "grey"
+        self.widget["highlightthickness"] = 1
         self.widget["width"] = width
         self.widget["height"] = height
-        self.widget["borderwidth"] = 1
-        self.widget["relief"] = "solid"
 
     def pack(self, options):
         """Displays and arranges, geometrically, this widget.
