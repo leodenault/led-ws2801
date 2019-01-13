@@ -28,3 +28,9 @@ class Device:
     def clear(self):
         """Clears all of the LEDs controlled by this device.
         """
+
+    @abstractmethod
+    def get_num_leds(self):
+        """
+        :return: the number of LEDs on this device.
+        """

@@ -10,10 +10,13 @@ from colour.cubic_interpolation import CubicInterpolation
 from colour.linear_interpolation import LinearInterpolation
 from colour.no_interpolation import NoInterpolation
 from colour.quadratic_interpolation import QuadraticInterpolation
-from display.led_strip.led_strip import LedDirection
-from display.led_strip.led_strip import LedStrip
-from display.led_strip.regular_brightness_schedule import \
+from display.led_strip import LedDirection
+from display.led_strip import LedStrip
+from display.brightness.regular_brightness_schedule import \
     RegularBrightnessSchedule
+from display.adafruit_ws2801.adafruit_ws2801_led_strip_controller_adapter \
+    import \
+    AdafruitWs2801LedStripControllerAdapter
 from pattern import stream_pattern
 from pattern.snow_pattern import SnowPattern
 from pattern.sorting.bubble_sort_pattern import BubbleSortPattern
@@ -34,11 +37,11 @@ def _generate_sort_palette(sort_pattern):
         candidates[0],
         candidates[1],
         QuadraticInterpolation(),
-        leds.num_leds))
+        leds.get_num_leds()))
 
 
 leds = LedStrip(
-  86,
+  AdafruitWs2801LedStripControllerAdapter(86),
   RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
   LedDirection.END_TO_START)
 
@@ -73,7 +76,7 @@ patterns = [
             led_colour.GOLD],
           4,
           5),
-        leds.num_leds)),
+        leds.get_num_leds())),
     # Binary colour stream pattern.
     lambda: binary_colour_stream_pattern.animate(
       leds,
@@ -82,7 +85,7 @@ patterns = [
           [led_colour.WHITE, led_colour.RED, led_colour.GREEN, led_colour.GOLD],
           2,
           2),
-        leds.num_leds)),
+        leds.get_num_leds())),
     # Smooth stream pattern.
     lambda:
     smooth_stream_pattern.animate(
@@ -94,7 +97,7 @@ patterns = [
       leds,
       stream_pattern.create_colour_cycle(
         [led_colour.RED, led_colour.GREEN, led_colour.BLUE],
-        leds.num_leds)),
+        leds.get_num_leds())),
     # Sort patterns.
     lambda: _generate_sort_palette(merge_sort_pattern),
     lambda: _generate_sort_palette(bubble_sort_pattern),

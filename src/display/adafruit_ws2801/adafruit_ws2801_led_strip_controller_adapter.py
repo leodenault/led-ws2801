@@ -22,6 +22,7 @@ class AdafruitWs2801LedStripControllerAdapter(Device):
         """
         self.controller = Adafruit_WS2801.WS2801Pixels(
           num_leds, spi=SPI.SpiDev(spi_port, spi_device))
+        self.num_leds = num_leds
 
     def set_led_colour(self, index, colour):
         self.controller.set_pixel_rgb(index, colour.r, colour.g, colour.b)
@@ -31,5 +32,8 @@ class AdafruitWs2801LedStripControllerAdapter(Device):
 
     def clear(self):
         self.controller.clear()
+
+    def get_num_leds(self):
+        return self.num_leds
 
 

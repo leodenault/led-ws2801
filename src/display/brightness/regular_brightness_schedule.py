@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from brightness_schedule import BrightnessSchedule
+from display.brightness_schedule import BrightnessSchedule
 
 
 class RegularBrightnessSchedule(BrightnessSchedule):

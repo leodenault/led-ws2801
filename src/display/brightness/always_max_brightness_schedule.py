@@ -1,4 +1,4 @@
-from brightness_schedule import BrightnessSchedule
+from display.brightness_schedule import BrightnessSchedule
 
 
 class AlwaysMaxBrightnessSchedule(BrightnessSchedule):
