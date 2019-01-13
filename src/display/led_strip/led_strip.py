@@ -1,5 +1,5 @@
-import Adafruit_GPIO.SPI as SPI
-import Adafruit_WS2801
+from adafruit_ws2801_led_strip_controller_adapter import \
+    AdafruitWs2801LedStripControllerAdapter
 
 from display.display import Display, LedDirection
 
@@ -34,8 +34,8 @@ class LedStrip(Display):
         :param spi_device: the SPI device to output to. For example, 
         specifying a device of 1 will use /dev/spidev0.1. Defaults to 0.
         """
-        self.leds = Adafruit_WS2801.WS2801Pixels(
-          num_leds, spi=SPI.SpiDev(spi_port, spi_device))
+        self.leds = AdafruitWs2801LedStripControllerAdapter(num_leds, spi_port,
+          spi_device)
         self.brightness_schedule = brightness_schedule
         self.direction = direction
         self.num_leds = num_leds
@@ -53,14 +53,10 @@ class LedStrip(Display):
 
         if led == LedStrip._ALL_LEDS:
             for i in range(0, self.num_leds):
-                self.leds.set_pixel_rgb(i, displayed_colour.r,
-                  displayed_colour.g, displayed_colour.b)
+                self.leds.set_led_colour(i, displayed_colour)
         else:
-            self.leds.set_pixel_rgb(
-              self._fetch_physical_index(led),
-              displayed_colour.r,
-              displayed_colour.g,
-              displayed_colour.b)
+            self.leds.set_led_colour(
+              self._fetch_physical_index(led), displayed_colour)
 
     def set_colour_and_display(self, colour, led=_ALL_LEDS):
         """Sets the colour of one or all LEDs on a strip and then displays it.
@@ -83,11 +79,6 @@ class LedStrip(Display):
 
         self.leds.clear()
         self.leds.show()
-
-    def get_colour_at(self, index):
-        """Returns the colour at the provided logical index.
-        """
-        return self.leds.get_pixel_rgb(self._fetch_physical_index(index))
 
     def _fetch_physical_index(self, logical_index):
         return (

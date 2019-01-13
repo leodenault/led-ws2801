@@ -59,9 +59,3 @@ class Display:
         """Clears the LED strip of any colours currently displayed.
         """
         pass
-
-    @abstractmethod
-    def get_colour_at(self, index):
-        """Returns the colour at the provided logical index.
-        """
-        pass
