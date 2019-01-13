@@ -42,7 +42,7 @@ class StreamPattern(Pattern):
     def animate(self, leds, colour_palette):
         super(StreamPattern, self).animate(leds, colour_palette)
         num_colours = len(colour_palette)
-        num_leds = leds.num_leds
+        num_leds = leds.get_num_leds()
         segment_length = float(num_leds) / num_colours
         start_time = time.time()
 

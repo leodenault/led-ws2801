@@ -29,8 +29,14 @@ class LedWidget:
     def set_led_colour(self, colour):
         """Sets the colour of the LED widget to the given colour.
         """
-        self.widget["bg"] = self._convert_colour_to_hex(colour)
+        self.widget["bg"] = _convert_colour_to_hex(colour)
 
-    def _convert_colour_to_hex(self, colour):
-        return "#" + str(hex(colour.r)) + str(hex(colour.g)) + str(
-          hex(colour.b))
+
+def _convert_colour_to_hex(colour):
+    return ("#" + _component_to_hex(colour.r) + _component_to_hex(colour.g)
+            + _component_to_hex(colour.b))
+
+
+def _component_to_hex(component):
+    return (
+        hex(component)[2:] if component >= 16 else "0" + hex(component)[2:])

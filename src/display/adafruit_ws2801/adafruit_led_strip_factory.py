@@ -1,3 +1,12 @@
+"""Factory methods for creating an LedStrip object using an underlying
+Adafruit WS2801 controller.
+
+To ensure that your application functions correctly, please make sure to
+install the Adafruit controller by
+following the installation instructions at
+https://github.com/adafruit/Adafruit_Python_WS2801.
+"""
+
 from display.adafruit_ws2801.adafruit_ws2801_led_strip_controller_adapter \
     import \
     AdafruitWs2801LedStripControllerAdapter
@@ -12,10 +21,6 @@ def create_adafruit_led_strip(
   spi_device=0):
     """Creates an LedStrip instance using the Adafruit WS2801 controller as
     its device.
-
-    To ensure that your application functions correctly, please make sure to
-    follow the installation instructions at
-    https://github.com/adafruit/Adafruit_Python_WS2801.
 
     :param num_leds: the number of LEDs on the strip.
     :param brightness_schedule: the BrightnessSchedule object configuring

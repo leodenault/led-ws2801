@@ -1,5 +1,6 @@
 from Tkinter import Frame
 
+from colour.led_colour import Colour
 from led_widget import LedWidget
 
 
@@ -30,8 +31,8 @@ class LedStripWidget:
         :param options: the Tk options to use when packing this widget.
         """
         self.led_container.pack(options)
-        for i in range(0, len(self.leds)):
-            self.leds[i].pack({"side": "left"})
+        for led in self.leds:
+            led.pack({"side": "left"})
 
     def set_colour_at(self, index, colour):
         """Sets the colour of an LED at the given index.
@@ -40,3 +41,14 @@ class LedStripWidget:
         :param colour: the colour that the LED will be set to.
         """
         self.leds[index].set_led_colour(colour)
+
+    def clear(self):
+        """Resets all LEDs to black.
+        """
+        for led in self.leds:
+            led.set_led_colour(Colour(0, 0, 0))
+
+    def get_num_leds(self):
+        """Returns the number of LEDs on this widget.
+        """
+        return len(self.leds)

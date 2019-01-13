@@ -36,4 +36,5 @@ class AdafruitWs2801LedStripControllerAdapter(Device):
     def get_num_leds(self):
         return self.num_leds
 
-
+    def is_active(self):
+        return True

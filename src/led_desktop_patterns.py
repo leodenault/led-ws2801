@@ -3,16 +3,16 @@ colours.
 """
 
 import random
+import sys
 
 from colour import led_colour, palette
 from colour.cubic_interpolation import CubicInterpolation
 from colour.linear_interpolation import LinearInterpolation
 from colour.no_interpolation import NoInterpolation
 from colour.quadratic_interpolation import QuadraticInterpolation
-from display.brightness.regular_brightness_schedule import \
-    RegularBrightnessSchedule
-from display.led_strip import LedDirection
-from display.adafruit_ws2801 import adafruit_led_strip_factory
+from display.brightness.always_max_brightness_schedule import \
+    AlwaysMaxBrightnessSchedule
+from display.tkinter import tkinter_led_strip_factory
 from pattern import stream_pattern
 from pattern.snow_pattern import SnowPattern
 from pattern.sorting.bubble_sort_pattern import BubbleSortPattern
@@ -36,10 +36,9 @@ def _generate_sort_palette(sort_pattern):
         leds.get_num_leds()))
 
 
-leds = adafruit_led_strip_factory.create_adafruit_led_strip(
+leds = tkinter_led_strip_factory.create_tkinter_led_strip(
   86,
-  RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
-  LedDirection.END_TO_START)
+  AlwaysMaxBrightnessSchedule(1.0))
 
 colour_distributor = ColourDistributor(5)
 sort_celebration = SortCelebration(5, 1.5)
@@ -103,5 +102,5 @@ patterns = [
 
 leds.clear()
 
-while True:
+while leds.is_active():
     patterns[random.randint(0, len(patterns) - 1)]()

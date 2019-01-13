@@ -24,7 +24,7 @@ class MergeSortPattern(SortPattern):
           colour_palette,
           strip_data,
           0,
-          leds.num_leds - 1)
+          leds.get_num_leds() - 1)
 
     def _recursive_merge_sort(
       self,

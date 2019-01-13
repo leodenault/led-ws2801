@@ -37,7 +37,7 @@ class SnowPattern(Pattern):
                 snowflakes[i] += 1
 
             if (num_snowflakes > 0
-              and snowflakes[num_snowflakes - 1] >= leds.num_leds):
+              and snowflakes[num_snowflakes - 1] >= leds.get_num_leds()):
                 snowflakes.pop(num_snowflakes - 1)
                 num_snowflakes -= 1
 

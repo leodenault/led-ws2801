@@ -88,4 +88,13 @@ class LedStrip:
             self.device.get_num_leds() - logical_index - 1)
 
     def get_num_leds(self):
+        """
+        :return: the number of LEDs on the strip.
+        """
         return self.device.get_num_leds()
+
+    def is_active(self):
+        """
+        :return: Whether the LED strip is currently active or has shut down.
+        """
+        return self.device.is_active()

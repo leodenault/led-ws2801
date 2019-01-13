@@ -34,3 +34,10 @@ class Device:
         """
         :return: the number of LEDs on this device.
         """
+
+    @abstractmethod
+    def is_active(self):
+        """
+        :return: Whether the device is currently active or has shut down.
+        """
+        pass

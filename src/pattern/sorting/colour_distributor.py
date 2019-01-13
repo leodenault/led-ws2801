@@ -27,7 +27,7 @@ class ColourDistributor:
         """
         strip_data = []
         led_assignment_duration = (
-          float(self.distribution_duration) / leds.num_leds)
+          float(self.distribution_duration) / leds.get_num_leds())
         initial_colours = [c for c in colour_palette]
 
         i = 0
@@ -43,7 +43,7 @@ class ColourDistributor:
             initial_colours.pop(colour_index)
             i += 1
 
-        for i in range(i, leds.num_leds):
+        for i in range(i, leds.get_num_leds()):
             colour_index = random.randint(0, len(colour_palette) - 1)
             _assign_random_colour(
               leds,
