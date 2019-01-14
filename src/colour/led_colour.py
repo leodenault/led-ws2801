@@ -42,9 +42,9 @@ class Colour:
             return "({0}, {1}, {2})".format(self.r, self.g, self.b)
 
 
-WHITE = Colour(255, 255, 125, "White")
-RED = Colour(150, 0, 0, "Red")
-GREEN = Colour(0, 125, 0, "Green")
-BLUE = Colour(0, 0, 125, "Blue")
+WHITE = Colour(255, 255, 255, "White")
+RED = Colour(255, 0, 0, "Red")
+GREEN = Colour(0, 255, 0, "Green")
+BLUE = Colour(0, 0, 255, "Blue")
 BLACK = Colour(0, 0, 0, "Black")
-GOLD = Colour(255, 125, 0, "Gold")
+GOLD = Colour(255, 200, 0, "Gold")

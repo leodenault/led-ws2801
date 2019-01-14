@@ -25,7 +25,9 @@ class AdafruitWs2801LedStripControllerAdapter(Device):
         self.num_leds = num_leds
 
     def set_led_colour(self, index, colour):
-        self.controller.set_pixel_rgb(index, colour.r, colour.g, colour.b)
+        # Reduce the blue component in the lights.
+        self.controller.set_pixel_rgb(
+          index, colour.r, colour.g, int(colour.b * 0.4))
 
     def show(self):
         self.controller.show()
