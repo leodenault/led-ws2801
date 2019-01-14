@@ -1,40 +1,43 @@
-import time
+from pattern.pattern import Pattern
 
 
-class SortCelebration:
+class SortCelebration(Pattern):
     """Configuration for celebrating the end of a sorting pattern.
     """
 
-    def __init__(self, num_celebration_flashes, celebration_flash_duration):
+    def __init__(
+      self, num_celebration_flashes, celebration_flash_duration, strip_data):
         """Creates a SortCelebration configuration.
 
         :param num_celebration_flashes: the number of times the LEDs should
         flash in celebration.
         :param celebration_flash_duration: the amount of time, in seconds,
         it should take for a single flash to occur.
+        :param strip_data: the colour data displayed on the LED strip before
+        beginning this pattern, expressed as an array of Colours.
         """
 
         self.num_celebration_flashes = num_celebration_flashes
-        self.celebration_flash_duration = celebration_flash_duration
+        self.progress_per_second = 2.0 / celebration_flash_duration
+        self.current_flash_index = 0
+        self.flash_progress = 0
+        self.strip_data = strip_data
 
-    def celebrate(self, leds, strip_colours):
-        """Celebrates the end of a sorting pattern by flashing.
+    def update(self, leds, delta):
+        if self.is_done():
+            return
 
-        :param leds: the LedStrip reference used for communicating with the
-        physical LED strip.
-        :param strip_colours: an array of colours to be assigned to the LED
-        strip. Its size must be the same as the number of LEDs on the strip.
-        """
+        self.flash_progress += delta * self.progress_per_second
+        if self.flash_progress >= 1:
+            self.flash_progress = -1
+            self.current_flash_index += 1
 
-        strength_per_second = 2.0 / self.celebration_flash_duration
-        for flash_index in range(0, self.num_celebration_flashes):
-            strength = -1.0
-            while strength < 1.0:
-                start_time = time.time()
-                for colour_index in range(0, len(strip_colours)):
-                    leds.set_colour(
-                      strip_colours[colour_index].multiply(abs(strength)),
-                      colour_index)
-                leds.display()
-                elapsed_time = time.time() - start_time
-                strength += elapsed_time * strength_per_second
+        if self.is_done():
+            return
+
+        for i in range(0, len(self.strip_data)):
+            leds.set_colour(
+              self.strip_data[i].multiply(abs(self.flash_progress)), i)
+
+    def is_done(self):
+        return self.current_flash_index >= self.num_celebration_flashes

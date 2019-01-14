@@ -1,68 +1,55 @@
 import random
-import time
+
+from pattern.pattern import Pattern
+from pattern.time_interval import TimeInterval
 
 
-class ColourDistributor:
+class ColourDistributor(Pattern):
     """Randomly distributes colours to an LED strip.
     """
 
-    def __init__(self, distribution_duration):
-        """Creates a ColourDistribution configuration.
+    def __init__(self, leds, distribution_duration, colour_palette, strip_data):
+        """Creates a ColourDistribution pattern.
 
+        This pattern randomly distributes colours from the given colour
+        palette on the LED strip.
+
+        :param leds: the LedStrip instance.
         :param distribution_duration: the time it should take to distribute all
         colours across the LED strip.
+        :param colour_palette: the palette of colours which will be used to
+        randomly distribute colours onto the strip.
+        :param strip_data: the colour data displayed on the LED strip before
+        beginning this pattern, expressed as an array of Colours.
         """
-        self.distribution_duration = distribution_duration
+        self.time_interval = TimeInterval(
+          distribution_duration / float(leds.get_num_leds()))
+        self.colour_palette = colour_palette
+        self.strip_data = strip_data
+        self.initial_colours = [c for c in colour_palette]
+        self.current_led = 0
+        self.num_leds = leds.get_num_leds()
 
-    def distribute(self, leds, colour_palette):
-        """Randomly distributes colours across an LED strip.
+    def update(self, leds, delta):
+        time_exceeded = self.time_interval.time_exceeded(delta)
+        if self.is_done() or not time_exceeded:
+            return
 
-        :param leds: the LedStrip object used to communicate with the
-        physical LED strip.
-        :param colour_palette: the set of colours which should be used to
-        distribute
-        across the strip.
-        :return the state of the colours currently displayed on the LED strip
-        in the form of an array.
-        """
-        strip_data = []
-        led_assignment_duration = (
-          float(self.distribution_duration) / leds.get_num_leds())
-        initial_colours = [c for c in colour_palette]
+        if len(self.initial_colours) > 0:
+            colour_index = self._assign_random_colour(
+              leds, self.initial_colours)
+            self.initial_colours.pop(colour_index)
+        else:
+            self._assign_random_colour(leds, self.colour_palette)
 
-        i = 0
-        while len(initial_colours) > 0:
-            colour_index = random.randint(0, len(initial_colours) - 1)
-            _assign_random_colour(
-              leds,
-              strip_data,
-              i,
-              initial_colours,
-              colour_index,
-              led_assignment_duration)
-            initial_colours.pop(colour_index)
-            i += 1
+        self.current_led += 1
 
-        for i in range(i, leds.get_num_leds()):
-            colour_index = random.randint(0, len(colour_palette) - 1)
-            _assign_random_colour(
-              leds,
-              strip_data,
-              i,
-              colour_palette,
-              colour_index,
-              led_assignment_duration)
-        return strip_data
+    def is_done(self):
+        return self.current_led >= self.num_leds
 
-
-def _assign_random_colour(
-  leds,
-  strip_data,
-  strip_data_index,
-  colour_palette,
-  colour_index,
-  led_assignment_duration):
-    colour = colour_palette[colour_index]
-    strip_data.append(colour)
-    leds.set_colour_and_display(colour, strip_data_index)
-    time.sleep(led_assignment_duration)
+    def _assign_random_colour(self, leds, colour_palette):
+        colour_index = random.randint(0, len(colour_palette) - 1)
+        colour = colour_palette[colour_index]
+        self.strip_data[self.current_led] = colour
+        leds.set_colour(colour, self.current_led)
+        return colour_index

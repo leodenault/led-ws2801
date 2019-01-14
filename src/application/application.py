@@ -7,18 +7,15 @@ class Application:
     for interacting with a strip.
     """
 
-    def __init__(self, leds, pattern_factories, pattern_display_time):
+    def __init__(self, leds, pattern_factories):
         """Creates an Application instance.
 
         :param leds: the LedStrip object used to interact with the LEDs.
         :param pattern_factories: A list of lambdas which instantiate a given
         pattern.
-        :param pattern_display_time: the time, in seconds, that a given pattern
-        should be run.
         """
         self.leds = leds
         self.pattern_factories = pattern_factories
-        self.pattern_display_time = pattern_display_time
 
     def run(self):
         """Starts running the application.
@@ -31,13 +28,11 @@ class Application:
     def _animate_pattern(self, pattern):
         print("Starting {0}!".format(pattern.__class__.__name__))
         self.leds.clear()
-        start_time = time.time()
-        current_time = start_time
-        previous_time = 0
-        while (
-          self.leds.is_active()
-          and current_time - start_time < self.pattern_display_time):
+        current_time = time.time()
+        previous_time = current_time
+        while self.leds.is_active() and not pattern.is_done():
             delta = current_time - previous_time
             previous_time = current_time
             pattern.update(self.leds, delta)
+            self.leds.display()
             current_time = time.time()
