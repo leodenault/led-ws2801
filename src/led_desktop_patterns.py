@@ -5,8 +5,9 @@ colours.
 import sys
 
 from application import application_factory
-from colour import led_colour
+from colour import led_colour, palette
 from colour.cubic_interpolation import CubicInterpolation
+from colour.led_colour import Colour
 from display.brightness.always_max_brightness_schedule import \
     AlwaysMaxBrightnessSchedule
 from pattern.stream_pattern import StreamPattern
@@ -22,6 +23,12 @@ application_factory.create_application(
      NUM_LEDS,
      10,
      CubicInterpolation(),
-     [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN],
-     sys.maxint),
+     palette.choose_random_from(
+       [
+           led_colour.RED,
+           led_colour.GOLD,
+           led_colour.PURPLE,
+           led_colour.CYAN,
+           Colour(0, 64, 128)]),
+     30),
    ]).run()
