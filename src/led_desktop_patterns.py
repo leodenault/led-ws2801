@@ -4,28 +4,24 @@ colours.
 
 import sys
 
-from application.application import Application
+from application import application_factory
 from colour import led_colour
 from colour.cubic_interpolation import CubicInterpolation
-from display.adafruit_ws2801 import adafruit_led_strip_factory
 from display.brightness.always_max_brightness_schedule import \
     AlwaysMaxBrightnessSchedule
 from pattern.stream_pattern import StreamPattern
 
-leds = adafruit_led_strip_factory.create_adafruit_led_strip(
-  86,
-  AlwaysMaxBrightnessSchedule(1.0))
+NUM_LEDS = 86
 
-patterns = [
-    # Smooth stream pattern.
-    lambda:
-    StreamPattern(
-      leds,
-      10,
-      CubicInterpolation(),
-      [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN],
-      sys.maxint),
-]
-
-app = Application(leds, patterns)
-app.run()
+application_factory.create_application(
+  sys.argv,
+  NUM_LEDS,
+  AlwaysMaxBrightnessSchedule(1.0),
+  [lambda:
+   StreamPattern(
+     NUM_LEDS,
+     10,
+     CubicInterpolation(),
+     [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN],
+     sys.maxint),
+   ]).run()

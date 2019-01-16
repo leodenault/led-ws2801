@@ -11,7 +11,7 @@ def compare(colour1, colour2, colours):
 
 
 def create_bubble_sort_pattern(
-  leds,
+  num_leds,
   distribution_duration,
   sort_step_duration,
   num_celebration_flashes,
@@ -20,7 +20,7 @@ def create_bubble_sort_pattern(
     """Creates a pattern instance that sorts colours using the bubble sort
     algorithm.
 
-    :param leds: the LedStrip instance.
+    :param num_leds: the number of LEDs on the device.
     :param distribution_duration: the time it should take to distribute all
     colours across the LED strip.
     :param sort_step_duration: the amount of time a single step takes to
@@ -32,11 +32,11 @@ def create_bubble_sort_pattern(
     :param colour_palette: the palette of colours which will be used to
     randomly distribute colours onto the strip.
     """
-    strip_data = [led_colour.BLACK] * leds.get_num_leds()
+    strip_data = [led_colour.BLACK] * num_leds
     return PatternChain([
         lambda:
         ColourDistributor(
-          leds, distribution_duration, colour_palette, strip_data),
+          num_leds, distribution_duration, colour_palette, strip_data),
         lambda:
         BubbleSortPattern(colour_palette, strip_data, sort_step_duration),
         lambda:
@@ -46,7 +46,7 @@ def create_bubble_sort_pattern(
 
 
 def create_merge_sort_pattern(
-  leds,
+  num_leds,
   distribution_duration,
   sort_step_duration,
   num_celebration_flashes,
@@ -55,7 +55,7 @@ def create_merge_sort_pattern(
     """Creates a pattern instance that sorts colours using the merge sort
     algorithm.
 
-    :param leds: the LedStrip instance.
+    :param num_leds: the number of LEDs on the device.
     :param distribution_duration: the time it should take to distribute all
     colours across the LED strip.
     :param sort_step_duration: the amount of time a single step takes to
@@ -67,13 +67,13 @@ def create_merge_sort_pattern(
     :param colour_palette: the palette of colours which will be used to
     randomly distribute colours onto the strip.
     """
-    strip_data = [led_colour.BLACK] * leds.get_num_leds()
+    strip_data = [led_colour.BLACK] * num_leds
     return PatternChain([
         lambda:
         ColourDistributor(
-          leds, distribution_duration, colour_palette, strip_data),
+          num_leds, distribution_duration, colour_palette, strip_data),
         lambda:
-        MergeSortPattern(leds, sort_step_duration, colour_palette, strip_data),
+        MergeSortPattern(num_leds, sort_step_duration, colour_palette, strip_data),
         lambda:
         SortCelebration(
           num_celebration_flashes, celebration_flash_duration, strip_data),

@@ -47,10 +47,10 @@ class MergeSortPattern(Pattern):
     """A pattern which sorts colours using the merge sort algorithm.
     """
 
-    def __init__(self, leds, sort_step_duration, colour_palette, strip_data):
+    def __init__(self, num_leds, sort_step_duration, colour_palette, strip_data):
         """Instantiates a MergeSortPattern.
 
-        :param leds: the LedStrip instance for communicating with the LEDs.
+        :param num_leds: the number of LEDs on the device.
         :param sort_step_duration: the amount of time a single step takes to
         execute.
         :param colour_palette: the set of colours used for comparison
@@ -63,7 +63,7 @@ class MergeSortPattern(Pattern):
         self.colour_palette = colour_palette
         self.strip_data = strip_data
         self.segments = []
-        self._generate_segments(0, leds.get_num_leds() - 1, self.segments)
+        self._generate_segments(0, num_leds - 1, self.segments)
         self.current_segment = _SegmentContext(0, 0, 1, None, None)
 
     def update(self, leds, delta):

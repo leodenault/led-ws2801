@@ -8,13 +8,13 @@ class ColourDistributor(Pattern):
     """Randomly distributes colours to an LED strip.
     """
 
-    def __init__(self, leds, distribution_duration, colour_palette, strip_data):
+    def __init__(self, num_leds, distribution_duration, colour_palette, strip_data):
         """Creates a ColourDistribution pattern.
 
         This pattern randomly distributes colours from the given colour
         palette on the LED strip.
 
-        :param leds: the LedStrip instance.
+        :param num_leds: the number of LEDs on the device.
         :param distribution_duration: the time it should take to distribute all
         colours across the LED strip.
         :param colour_palette: the palette of colours which will be used to
@@ -23,12 +23,12 @@ class ColourDistributor(Pattern):
         beginning this pattern, expressed as an array of Colours.
         """
         self.time_interval = TimeInterval(
-          distribution_duration / float(leds.get_num_leds()))
+          distribution_duration / float(num_leds))
         self.colour_palette = colour_palette
         self.strip_data = strip_data
         self.initial_colours = [c for c in colour_palette]
         self.current_led = 0
-        self.num_leds = leds.get_num_leds()
+        self.num_leds = num_leds
 
     def update(self, leds, delta):
         time_exceeded = self.time_interval.time_exceeded(delta)

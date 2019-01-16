@@ -27,13 +27,14 @@ class StreamPattern(TimedPattern):
 
     def __init__(
       self,
-      leds,
+      num_leds,
       leds_per_second,
       interpolation_mode,
       colour_palette,
       display_time):
         """Creates a StreamPattern object.
 
+        :param num_leds: the number of LEDs on the device.
         :param leds_per_second: the amount, in LED pixels, by which to move
         the position of the colours every second
         :param interpolation_mode: the InterpolationMode to use to
@@ -48,7 +49,7 @@ class StreamPattern(TimedPattern):
         self.colour_palette = colour_palette
         self.interpolation_mode = interpolation_mode
         self.segment_length = (
-          float(leds.get_num_leds()) / len(self.colour_palette))
+          float(num_leds) / len(self.colour_palette))
         self.colour_positions = [i * self.segment_length for i in
                                  range(0, len(colour_palette))]
 

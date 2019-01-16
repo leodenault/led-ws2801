@@ -2,13 +2,14 @@
 colours.
 """
 
-from application.application import Application
+import sys
+
+from application import application_factory
 from colour import led_colour, palette
 from colour.cubic_interpolation import CubicInterpolation
 from colour.linear_interpolation import LinearInterpolation
 from colour.no_interpolation import NoInterpolation
 from colour.quadratic_interpolation import QuadraticInterpolation
-from display.adafruit_ws2801 import adafruit_led_strip_factory
 from display.brightness.regular_brightness_schedule import \
     RegularBrightnessSchedule
 from display.led_strip import LedDirection
@@ -27,84 +28,84 @@ def _generate_sort_palette():
       candidates[0],
       candidates[1],
       QuadraticInterpolation(),
-      leds.get_num_leds())
+      NUM_LEDS)
 
 
-leds = adafruit_led_strip_factory.create_adafruit_led_strip(
-  86,
+NUM_LEDS = 86
+PATTERN_DISPLAY_TIME = 30
+
+application_factory.create_application(
+  sys.argv,
+  NUM_LEDS,
   RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
-  LedDirection.END_TO_START)
-
-patterns = [
-    # Multi-colour stream pattern.
-    lambda:
-    StreamPattern(
-      leds,
-      6,
-      NoInterpolation(),
-      stream_pattern.create_colour_cycle(
-        palette.choose_random_from([
-            led_colour.WHITE,
-            led_colour.RED,
-            led_colour.GREEN,
-            led_colour.BLUE,
-            led_colour.GOLD],
-          4,
-          5),
-        leds.get_num_leds()),
-      10),
-    # Binary colour stream pattern.
-    lambda:
-    StreamPattern(
-      leds,
-      4,
-      NoInterpolation(),
-      stream_pattern.create_colour_cycle(
-        palette.choose_random_from(
-          [led_colour.WHITE, led_colour.RED, led_colour.GREEN,
-           led_colour.GOLD],
-          2,
-          2),
-        leds.get_num_leds()),
-      10),
-    # Smooth stream pattern.
-    lambda:
-    StreamPattern(
-      leds,
-      10,
-      CubicInterpolation(),
-      [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN],
-      10),
-    # Phasing stream pattern.
-    lambda:
-    StreamPattern(
-      leds,
-      0.25,
-      LinearInterpolation(),
-      stream_pattern.create_colour_cycle(
-        [led_colour.RED, led_colour.GREEN, led_colour.BLUE],
-        leds.get_num_leds()),
-      10),
-    # Sort patterns.
-    lambda:
-    sort_patterns.create_bubble_sort_pattern(
-      leds,
-      5,
-      0.02,
-      5,
-      1.5,
-      _generate_sort_palette()),
-    lambda:
-    sort_patterns.create_merge_sort_pattern(
-      leds,
-      0.5,
-      0.08,
-      5,
-      1.5,
-      _generate_sort_palette()),
-    # Snow pattern.
-    lambda: SnowPattern(led_colour.WHITE, 0.1, 0.2, 10),
-]
-
-app = Application(leds, patterns)
-app.run()
+  [
+      # Multi-colour stream pattern.
+      lambda:
+      StreamPattern(
+        NUM_LEDS,
+        6,
+        NoInterpolation(),
+        stream_pattern.create_colour_cycle(
+          palette.choose_random_from([
+              led_colour.WHITE,
+              led_colour.RED,
+              led_colour.GREEN,
+              led_colour.BLUE,
+              led_colour.GOLD],
+            4,
+            5),
+          NUM_LEDS),
+        PATTERN_DISPLAY_TIME),
+      # Binary colour stream pattern.
+      lambda:
+      StreamPattern(
+        NUM_LEDS,
+        4,
+        NoInterpolation(),
+        stream_pattern.create_colour_cycle(
+          palette.choose_random_from(
+            [led_colour.WHITE, led_colour.RED, led_colour.GREEN,
+             led_colour.GOLD],
+            2,
+            2),
+          NUM_LEDS),
+        PATTERN_DISPLAY_TIME),
+      # Smooth stream pattern.
+      lambda:
+      StreamPattern(
+        NUM_LEDS,
+        10,
+        CubicInterpolation(),
+        [led_colour.WHITE, led_colour.RED, led_colour.GOLD, led_colour.GREEN],
+        PATTERN_DISPLAY_TIME),
+      # Phasing stream pattern.
+      lambda:
+      StreamPattern(
+        NUM_LEDS,
+        0.25,
+        LinearInterpolation(),
+        stream_pattern.create_colour_cycle(
+          [led_colour.RED, led_colour.GREEN, led_colour.BLUE],
+          NUM_LEDS),
+        PATTERN_DISPLAY_TIME),
+      # Sort patterns.
+      lambda:
+      sort_patterns.create_bubble_sort_pattern(
+        NUM_LEDS,
+        5,
+        0.02,
+        5,
+        1.5,
+        _generate_sort_palette()),
+      lambda:
+      sort_patterns.create_merge_sort_pattern(
+        NUM_LEDS,
+        0.5,
+        0.08,
+        5,
+        1.5,
+        _generate_sort_palette()),
+      # Snow pattern.
+      lambda: SnowPattern(led_colour.WHITE, 0.1, 0.2, PATTERN_DISPLAY_TIME),
+  ],
+  LedDirection.END_TO_START).run()
