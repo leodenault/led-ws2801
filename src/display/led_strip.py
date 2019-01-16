@@ -55,7 +55,8 @@ class LedStrip:
 
         if led == LedStrip._ALL_LEDS:
             for i in range(0, self.device.get_num_leds()):
-                self.device.set_led_colour(i, displayed_colour)
+                self.device.set_led_colour(
+                  self._fetch_physical_index(i), displayed_colour)
         else:
             self.device.set_led_colour(
               self._fetch_physical_index(led), displayed_colour)
