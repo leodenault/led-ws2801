@@ -12,7 +12,7 @@ from display.brightness.always_max_brightness_schedule import \
     AlwaysMaxBrightnessSchedule
 from pattern.stream_pattern import StreamPattern
 
-NUM_LEDS = 86
+NUM_LEDS = 71
 
 application_factory.create_application(
   sys.argv,
