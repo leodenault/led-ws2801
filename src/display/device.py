@@ -19,6 +19,14 @@ class Device:
         pass
 
     @abstractmethod
+    def get_led_colour(self, index):
+        """Gets the colour for the LED at the specific index.
+
+        :param index: the index of the LED whose colour should be returned
+        """
+        pass
+
+    @abstractmethod
     def show(self):
         """Signals to the device that it should display whatever colours have
         been set on it.

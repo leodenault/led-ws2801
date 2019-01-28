@@ -15,9 +15,9 @@ class Colour:
         between 0 and 255.
         :param name: the name of the colour.
         """
-        self.r = r
-        self.g = g
-        self.b = b
+        self.r = min(r, 255)
+        self.g = min(g, 255)
+        self.b = min(b, 255)
         self.name = name
 
     def add(self, other):
@@ -34,6 +34,11 @@ class Colour:
           int(self.r * factor),
           int(self.g * factor),
           int(self.b * factor))
+
+    def copy(self):
+        """Returns a copy of this colour.
+        """
+        return Colour(self.r, self.g, self.b)
 
     def __str__(self):
         if self.name:

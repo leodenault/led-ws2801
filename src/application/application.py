@@ -1,5 +1,5 @@
-import time
 import random
+import time
 
 
 class Application:
@@ -27,7 +27,7 @@ class Application:
 
     def _animate_pattern(self, pattern):
         print("Starting {0}!".format(pattern.__class__.__name__))
-        self.leds.clear()
+        self.leds.clear_and_show()
         current_time = time.time()
         previous_time = current_time
         while self.leds.is_active() and not pattern.is_done():

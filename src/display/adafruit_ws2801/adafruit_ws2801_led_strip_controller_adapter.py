@@ -2,6 +2,7 @@ import Adafruit_GPIO.SPI as SPI
 import Adafruit_WS2801
 
 from display.device import Device
+from colour.led_colour import Colour
 
 
 class AdafruitWs2801LedStripControllerAdapter(Device):
@@ -28,6 +29,10 @@ class AdafruitWs2801LedStripControllerAdapter(Device):
         # Reduce the blue component in the lights.
         self.controller.set_pixel_rgb(
           index, colour.r, colour.g, int(colour.b * 0.4))
+
+    def get_led_colour(self, index):
+        r, g, b = self.controller.get_pixel_rgb(index)
+        return Colour(r, g, b)
 
     def show(self):
         self.controller.show()

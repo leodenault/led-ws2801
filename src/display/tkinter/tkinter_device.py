@@ -29,6 +29,9 @@ class TkinterDevice(Device):
     def set_led_colour(self, index, colour):
         self.led_strip.set_colour_at(index, colour)
 
+    def get_led_colour(self, index):
+        return self.led_strip.get_colour_at(index)
+
     def show(self):
         self.top_widget.update_idletasks()
         self.top_widget.update()

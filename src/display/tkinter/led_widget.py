@@ -1,5 +1,6 @@
 from Tkinter import Frame
-
+from colour.led_colour import Colour
+from colour import led_colour
 
 class LedWidget:
     """Tk widget representing an LED on a strip.
@@ -14,6 +15,7 @@ class LedWidget:
         """
         self.widget = Frame(master)
         self.widget["bg"] = "black"
+        self.colour = led_colour.BLACK
         self.widget["highlightbackground"] = "grey"
         self.widget["highlightthickness"] = 1
         self.widget["width"] = width
@@ -30,6 +32,12 @@ class LedWidget:
         """Sets the colour of the LED widget to the given colour.
         """
         self.widget["bg"] = _convert_colour_to_hex(colour)
+        self.colour = colour.copy()
+
+    def get_led_colour(self):
+        """Returns the colour of the LED widget.
+        """
+        return self.colour
 
 
 def _convert_colour_to_hex(colour):

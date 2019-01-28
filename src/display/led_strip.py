@@ -13,6 +13,18 @@ class LedDirection:
     """
 
 
+class DrawingMode:
+    """Mode defining how to draw the colour on a particular LED.
+    """
+    OVERLAY = 0
+    """Draws the colour on top of whatever is currently displayed, erasing 
+    what was previously there.
+    """
+    BLEND = 1
+    """Draws the colours and blends it with whatever colour is already present.
+    """
+
+
 class LedStrip:
     """Abstraction around a WS2801 LED strip connected to a Raspberry Pi
     through its GPIO pins and communicating through SPI.
@@ -42,12 +54,13 @@ class LedStrip:
         self.brightness_schedule = brightness_schedule
         self.direction = direction
 
-    def set_colour(self, colour, led=_ALL_LEDS):
+    def set_colour(self, colour, led=_ALL_LEDS, mode=DrawingMode.OVERLAY):
         """Sets the colour of one or all LEDs on a strip.
 
         :param colour: the colour to output to the LED.
         :param led: the index of the LED to output the colour to. If
         unspecified, then colour is displayed on all LEDs.
+        :param mode: the DrawingMode to use when displaying the colour.
         """
 
         brightness = self.brightness_schedule.get_brightness()
@@ -55,20 +68,20 @@ class LedStrip:
 
         if led == LedStrip._ALL_LEDS:
             for i in range(0, self.device.get_num_leds()):
-                self.device.set_led_colour(
-                  self._fetch_physical_index(i), displayed_colour)
+                self._set_colour_on_led(i, displayed_colour, mode)
         else:
-            self.device.set_led_colour(
-              self._fetch_physical_index(led), displayed_colour)
+            self._set_colour_on_led(led, displayed_colour, mode)
 
-    def set_colour_and_display(self, colour, led=_ALL_LEDS):
+    def set_colour_and_display(
+      self, colour, led=_ALL_LEDS, mode=DrawingMode.OVERLAY):
         """Sets the colour of one or all LEDs on a strip and then displays it.
 
         :param colour: the colour to output to the LED.
         :param led: the index of the LED to output the colour to. If
         unspecified, then colour is displayed on all LEDs.
+        :param mode: the DrawingMode to use when displaying the colour.
         """
-        self.set_colour(colour, led)
+        self.set_colour(colour, led, mode)
         self.device.show()
 
     def display(self):
@@ -78,6 +91,12 @@ class LedStrip:
 
     def clear(self):
         """Clears the LED strip of any colours currently displayed.
+        """
+        self.device.clear()
+
+    def clear_and_show(self):
+        """Clears the LED strip of any colours currently displayed and
+        displays their state.
         """
 
         self.device.clear()
@@ -99,3 +118,10 @@ class LedStrip:
         :return: Whether the LED strip is currently active or has shut down.
         """
         return self.device.is_active()
+
+    def _set_colour_on_led(self, index, colour, mode):
+        if mode == DrawingMode.BLEND:
+            existing_colour = self.device.get_led_colour(index)
+            colour = colour.add(existing_colour)
+
+        self.device.set_led_colour(index, colour)

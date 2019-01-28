@@ -42,6 +42,13 @@ class LedStripWidget:
         """
         self.leds[index].set_led_colour(colour)
 
+    def get_colour_at(self, index):
+        """Gets the colour for the LED at the specific index.
+
+        :param index: the index of the LED whose colour should be returned
+        """
+        return self.leds[index].get_led_colour()
+
     def clear(self):
         """Resets all LEDs to black.
         """
