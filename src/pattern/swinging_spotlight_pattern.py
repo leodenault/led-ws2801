@@ -3,6 +3,8 @@ import math
 from renderable.spotlight import Spotlight
 from timed_pattern import TimedPattern
 
+_PHASE_SHIFT = -math.pi / 2
+
 
 class SwingingSpotlightPattern(TimedPattern):
     """A pattern where two spotlights "swing" from each end of the LED strip
@@ -27,6 +29,7 @@ class SwingingSpotlightPattern(TimedPattern):
         self.spotlight1 = Spotlight(0, colour1, spotlight_radius)
         self.spotlight2 = Spotlight(0, colour2, spotlight_radius)
         self.swing_period = swing_period
+        self.angular_momentum = 2 * math.pi / self.swing_period
 
     def update(self, leds, delta):
         super(SwingingSpotlightPattern, self).update(leds, delta)
@@ -44,8 +47,6 @@ class SwingingSpotlightPattern(TimedPattern):
     def _compute_position(self, num_leds):
         amplitude = (num_leds / 2.0) - self.spotlight_radius
         vertical_shift = num_leds / 2.0
-        angular_momentum = 2 * math.pi / self.swing_period
-        phase_shift = -math.pi / 2
-        return (
-          amplitude * math.sin(
-          angular_momentum * self.elapsed_time + phase_shift) + vertical_shift)
+        return (amplitude * math.sin(
+          self.angular_momentum * self.elapsed_time + _PHASE_SHIFT) +
+                vertical_shift)

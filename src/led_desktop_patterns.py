@@ -12,6 +12,7 @@ from display.brightness.always_max_brightness_schedule import \
     AlwaysMaxBrightnessSchedule
 from pattern.stream_pattern import StreamPattern
 from pattern.swinging_spotlight_pattern import SwingingSpotlightPattern
+from pattern.pulsing_pattern import PulsingPattern
 
 NUM_LEDS = 71
 
@@ -20,6 +21,9 @@ application_factory.create_application(
   NUM_LEDS,
   AlwaysMaxBrightnessSchedule(1.0),
   [
+      lambda:
+      PulsingPattern(
+        [led_colour.RED, led_colour.BLUE, led_colour.PURPLE], 15, 100),
       lambda:
       SwingingSpotlightPattern(
         palette.choose_random_from([led_colour.PURPLE, led_colour.RED], 1, 1)[
