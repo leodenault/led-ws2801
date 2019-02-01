@@ -23,11 +23,11 @@ class Spotlight(Renderable):
         self.brightness_function_factor = -1.0 / (radius * radius)
 
     def render(self, leds):
+        previous_drawing_mode = leds.get_drawing_mode()
+        leds.set_drawing_mode(DrawingMode.BLEND)
+
         if self.position % 1 == 0:
-            leds.set_colour(
-              self.colour,
-              int(self.position),
-              DrawingMode.BLEND)
+            leds.set_colour(self.colour, int(self.position))
 
         for i in range(1, self.radius + 1):
             num_leds = leds.get_num_leds()
@@ -37,13 +37,13 @@ class Spotlight(Renderable):
             leds.set_colour(
               self.colour.multiply(
                 self._compute_brightness(left_position - self.position)),
-              left_position % num_leds,
-              DrawingMode.BLEND)
+              left_position % num_leds)
             leds.set_colour(
               self.colour.multiply(
                 self._compute_brightness(right_position - self.position)),
-              right_position % num_leds,
-              DrawingMode.BLEND)
+              right_position % num_leds)
+
+        leds.set_drawing_mode(previous_drawing_mode)
 
     def setPosition(self, position):
         self.position = position

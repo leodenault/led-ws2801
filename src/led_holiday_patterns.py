@@ -38,6 +38,7 @@ application_factory.create_application(
   sys.argv,
   NUM_LEDS,
   RegularBrightnessSchedule(7, 9, 16, 21, 0.1, 1.0),
+  5,
   [
       # Multi-colour stream pattern.
       lambda:

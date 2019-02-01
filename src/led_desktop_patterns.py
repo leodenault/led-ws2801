@@ -20,10 +20,11 @@ application_factory.create_application(
   sys.argv,
   NUM_LEDS,
   AlwaysMaxBrightnessSchedule(1.0),
+  5,
   [
       lambda:
       PulsingPattern(
-        [led_colour.RED, led_colour.BLUE, led_colour.PURPLE], 15, 100),
+        [led_colour.RED, led_colour.BLUE, led_colour.PURPLE], 7.5, 40),
       lambda:
       SwingingSpotlightPattern(
         palette.choose_random_from([led_colour.PURPLE, led_colour.RED], 1, 1)[
@@ -31,8 +32,8 @@ application_factory.create_application(
         palette.choose_random_from([led_colour.PURPLE, led_colour.RED], 1, 1)[
             0],
         7,
-        15,
-        90),
+        7.5,
+        40),
       lambda:
       StreamPattern(
         NUM_LEDS,

@@ -53,35 +53,35 @@ class LedStrip:
         self.device = device
         self.brightness_schedule = brightness_schedule
         self.direction = direction
+        self.drawing_mode = DrawingMode.OVERLAY
+        self.transparency = 1.0
 
-    def set_colour(self, colour, led=_ALL_LEDS, mode=DrawingMode.OVERLAY):
+    def set_colour(self, colour, led=_ALL_LEDS):
         """Sets the colour of one or all LEDs on a strip.
 
         :param colour: the colour to output to the LED.
         :param led: the index of the LED to output the colour to. If
         unspecified, then colour is displayed on all LEDs.
-        :param mode: the DrawingMode to use when displaying the colour.
         """
 
         brightness = self.brightness_schedule.get_brightness()
-        displayed_colour = colour.multiply(brightness)
+        displayed_colour = colour.multiply(brightness).multiply(
+          self.transparency)
 
         if led == LedStrip._ALL_LEDS:
             for i in range(0, self.device.get_num_leds()):
-                self._set_colour_on_led(i, displayed_colour, mode)
+                self._set_colour_on_led(i, displayed_colour, self.drawing_mode)
         else:
-            self._set_colour_on_led(led, displayed_colour, mode)
+            self._set_colour_on_led(led, displayed_colour, self.drawing_mode)
 
-    def set_colour_and_display(
-      self, colour, led=_ALL_LEDS, mode=DrawingMode.OVERLAY):
+    def set_colour_and_display(self, colour, led=_ALL_LEDS):
         """Sets the colour of one or all LEDs on a strip and then displays it.
 
         :param colour: the colour to output to the LED.
         :param led: the index of the LED to output the colour to. If
         unspecified, then colour is displayed on all LEDs.
-        :param mode: the DrawingMode to use when displaying the colour.
         """
-        self.set_colour(colour, led, mode)
+        self.set_colour(colour, led)
         self.device.show()
 
     def display(self):
@@ -101,6 +101,30 @@ class LedStrip:
 
         self.device.clear()
         self.device.show()
+
+    def get_drawing_mode(self):
+        """Returns the DrawingMode currently used to display colours on the
+        LED strip.
+        """
+        return self.drawing_mode
+
+    def set_drawing_mode(self, drawing_mode):
+        """Sets the DrawingMode to use when displaying colours on the LED strip.
+        """
+        self.drawing_mode = drawing_mode
+
+    def get_transparency(self):
+        """Returns the transparency used when displaying colours on the LEDs
+        strip. It will have a value between 0 and 1 where 0 is completely
+        transparent and 1 is completely opaque."""
+        return self.transparency
+
+    def set_transparency(self, transparency):
+        """Sets the transparency when displaying colours on the LEDs strip.
+        Set it with a value between 0 and 1 where 0 is completely transparent
+        and 1 is completely opaque.
+        """
+        self.transparency = max(0, min(1, transparency))
 
     def _fetch_physical_index(self, logical_index):
         return (

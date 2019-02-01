@@ -15,9 +15,9 @@ class Colour:
         between 0 and 255.
         :param name: the name of the colour.
         """
-        self.r = min(r, 255)
-        self.g = min(g, 255)
-        self.b = min(b, 255)
+        self.r = max(0, min(r, 255))
+        self.g = max(0, min(g, 255))
+        self.b = max(0, min(b, 255))
         self.name = name
 
     def add(self, other):
