@@ -24,7 +24,6 @@ class SwingingSpotlightPattern(TimedPattern):
         displayed.
         """
         super(SwingingSpotlightPattern, self).__init__(display_time)
-        self.elapsed_time = 0
         self.spotlight_radius = spotlight_radius
         self.spotlight1 = Spotlight(0, colour1, spotlight_radius)
         self.spotlight2 = Spotlight(0, colour2, spotlight_radius)
@@ -33,9 +32,7 @@ class SwingingSpotlightPattern(TimedPattern):
 
     def update(self, leds, delta):
         super(SwingingSpotlightPattern, self).update(leds, delta)
-        leds.clear()
         num_leds = leds.get_num_leds()
-        self.elapsed_time += delta
 
         spotlight1_position = self._compute_position(num_leds)
         self.spotlight1.setPosition(spotlight1_position)

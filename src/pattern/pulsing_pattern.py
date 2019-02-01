@@ -16,11 +16,9 @@ class PulsingPattern(TimedPattern):
         self.colour_palette = colour_palette
         self.pulse_period = pulse_period
         self.angular_momentum = (2 * math.pi) / self.pulse_period
-        self.elapsed_time = 0
 
     def update(self, leds, delta):
         super(PulsingPattern, self).update(leds, delta)
-        self.elapsed_time += delta
         current_colour = self.colour_palette[
             int(self.elapsed_time / self.pulse_period) % len(
               self.colour_palette)]
