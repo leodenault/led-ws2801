@@ -1,4 +1,4 @@
-"""Animates random patterns on a WS2801 LED strp mounted on desktop furniture
+"""Animates random patterns on a WS2801 LED strip mounted on desktop furniture
 for an aesthetically pleasing effect.
 """
 
