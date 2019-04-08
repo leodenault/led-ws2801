@@ -1,5 +1,5 @@
-"""Animates random patterns on a WS2801 LED strip with traditional holiday
-colours.
+"""Animates random patterns on a WS2801 LED strp mounted on desktop furniture
+for an aesthetically pleasing effect.
 """
 
 import sys
