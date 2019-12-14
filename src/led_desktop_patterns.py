@@ -65,7 +65,7 @@ HOLIDAY_PATTERNS = [
   lambda:
   StreamPattern(
     num_leds=NUM_LEDS,
-    period=10,
+    period=5,
     interpolation_mode=CubicInterpolation(),
     colour_palette=palette.choose_random_from(
       [
@@ -92,6 +92,13 @@ HOLIDAY_PATTERNS = [
     num_leds=NUM_LEDS,
     average_time_between_twinkles=0.5,
     twinkle_length=5,
+    display_time=30
+  ),
+  lambda:
+  TwinklePattern(
+    num_leds=NUM_LEDS,
+    average_time_between_twinkles=0.3,
+    twinkle_length=1,
     display_time=30
   )
 ]
