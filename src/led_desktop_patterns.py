@@ -2,21 +2,36 @@
 for an aesthetically pleasing effect.
 """
 
+import random
 import sys
+from datetime import datetime
 
 from application import application_factory
 from colour import led_colour, palette
 from colour.cubic_interpolation import CubicInterpolation
 from colour.led_colour import Colour
-from datetime import datetime
+from colour.linear_interpolation import LinearInterpolation
 from display.brightness.always_max_brightness_schedule import \
   AlwaysMaxBrightnessSchedule
+from pattern import stream_pattern
+from pattern.pulsing_pattern import PulsingPattern
 from pattern.stream_pattern import StreamPattern
 from pattern.swinging_spotlight_pattern import SwingingSpotlightPattern
-from pattern.pulsing_pattern import PulsingPattern
 from pattern.twinkle_pattern import TwinklePattern
 
 NUM_LEDS = 71
+MIN_PULSE_PERIOD = 5
+MAX_PULSE_PERIOD = 10
+MIN_STREAM_PERIOD = 3
+MAX_STREAM_PERIOD = 15
+MIN_STREAM_SEGMENTS = 5
+MAX_STREAM_SEGMENTS = 40
+MIN_STREAM_COLOUR_LENGTH = int(NUM_LEDS / MAX_STREAM_SEGMENTS)
+MAX_STREAM_COLOUR_LENGTH = int(NUM_LEDS / MIN_STREAM_SEGMENTS)
+MIN_TIME_BETWEEN_TWINKLES = 0.2
+MAX_TIME_BETWEEN_TWINKLES = 0.5
+MIN_TWINKLE_LENGTH = 1
+MAX_TWINKLE_LENGTH = 5
 REGULAR_PATTERNS = [
   lambda:
   PulsingPattern(
@@ -59,46 +74,47 @@ HOLIDAY_PATTERNS = [
       led_colour.WHITE,
       led_colour.GREEN
     ],
-    pulse_period=5,
+    pulse_period=random.randint(MIN_PULSE_PERIOD, MAX_PULSE_PERIOD),
     display_time=30
   ),
   lambda:
   StreamPattern(
     num_leds=NUM_LEDS,
-    period=5,
-    interpolation_mode=CubicInterpolation(),
-    colour_palette=palette.choose_random_from(
-      [
-        led_colour.RED,
-        led_colour.GOLD,
-        led_colour.WHITE,
-        led_colour.GREEN]),
+    period=random.randint(MIN_STREAM_PERIOD, MAX_STREAM_PERIOD),
+    interpolation_mode=LinearInterpolation(),
+    colour_palette=stream_pattern.create_colour_cycle(
+      palette.choose_random_from(
+        [
+          led_colour.RED,
+          led_colour.GOLD,
+          led_colour.WHITE,
+          led_colour.GREEN]),
+      NUM_LEDS,
+      random.randint(MIN_STREAM_COLOUR_LENGTH, MAX_STREAM_COLOUR_LENGTH)),
     display_time=30
   ),
   lambda:
   StreamPattern(
     num_leds=NUM_LEDS,
-    period=10,
-    interpolation_mode=CubicInterpolation(),
-    colour_palette=palette.choose_random_from(
+    period=random.randint(MIN_STREAM_PERIOD, MAX_STREAM_PERIOD),
+    interpolation_mode=LinearInterpolation(),
+    colour_palette=stream_pattern.create_colour_cycle(
+      palette.choose_random_from(
       [
         led_colour.BLUE,
         led_colour.GOLD,
         led_colour.WHITE]),
+    NUM_LEDS,
+    random.randint(MIN_STREAM_COLOUR_LENGTH, MAX_STREAM_COLOUR_LENGTH)),
     display_time=30
   ),
   lambda:
   TwinklePattern(
     num_leds=NUM_LEDS,
-    average_time_between_twinkles=0.5,
-    twinkle_length=5,
-    display_time=30
-  ),
-  lambda:
-  TwinklePattern(
-    num_leds=NUM_LEDS,
-    average_time_between_twinkles=0.3,
-    twinkle_length=1,
+    average_time_between_twinkles=(
+        random.random() * MAX_TIME_BETWEEN_TWINKLES
+        + MIN_TIME_BETWEEN_TWINKLES),
+    twinkle_length=random.randint(MIN_TWINKLE_LENGTH, MAX_TWINKLE_LENGTH),
     display_time=30
   )
 ]

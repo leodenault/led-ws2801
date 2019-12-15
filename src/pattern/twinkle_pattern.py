@@ -24,7 +24,7 @@ class _TwinklingLed:
     self.elapsed_time += delta
     if self.elapsed_time < self.twinkle_length:
       brightness = self._compute_brightness()
-      leds.set_colour(led_colour.OFF_WHITE.multiply(brightness), self.index)
+      leds.set_colour(led_colour.TWINKLE_GOLD.multiply(brightness), self.index)
 
   def _compute_brightness(self):
     return _AMPLITUDE * (math.sin(
