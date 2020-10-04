@@ -32,6 +32,8 @@ MIN_TIME_BETWEEN_TWINKLES = 0.2
 MAX_TIME_BETWEEN_TWINKLES = 0.5
 MIN_TWINKLE_LENGTH = 1
 MAX_TWINKLE_LENGTH = 5
+MIN_SWINGING_SPOTLIGHT_RADIUS = 2
+MAX_SWINGING_SPOTLIGHT_RADIUS = 15
 REGULAR_PATTERNS = [
   lambda:
   PulsingPattern(
@@ -62,6 +64,63 @@ REGULAR_PATTERNS = [
         led_colour.CYAN,
         Colour(0, 64, 128)]),
     display_time=30),
+]
+HALLOWEEN_PATTERNS = [
+  lambda:
+  StreamPattern(
+    num_leds=NUM_LEDS,
+    period=random.randint(MIN_STREAM_PERIOD, MAX_STREAM_PERIOD),
+    interpolation_mode=LinearInterpolation(),
+    colour_palette=stream_pattern.create_colour_cycle([
+      led_colour.RED,
+      led_colour.PURPLE,
+      led_colour.BLACK],
+      NUM_LEDS,
+      random.randint(MIN_STREAM_COLOUR_LENGTH, MAX_STREAM_COLOUR_LENGTH)),
+    display_time=30
+  ),
+  lambda:
+  StreamPattern(
+    num_leds=NUM_LEDS,
+    period=random.randint(MIN_STREAM_PERIOD, MAX_STREAM_PERIOD),
+    interpolation_mode=LinearInterpolation(),
+    colour_palette=stream_pattern.create_colour_cycle(
+      palette.choose_random_from(
+        [
+          led_colour.PURPLE,
+          led_colour.BLACK,
+          led_colour.ORANGE]),
+      NUM_LEDS,
+      random.randint(MIN_STREAM_COLOUR_LENGTH, MAX_STREAM_COLOUR_LENGTH)),
+    display_time=30
+  ),
+  lambda:
+  SwingingSpotlightPattern(
+    colour1=led_colour.PURPLE,
+    colour2=led_colour.PURPLE,
+    spotlight_radius=random.randint(MIN_SWINGING_SPOTLIGHT_RADIUS,
+                                    MAX_SWINGING_SPOTLIGHT_RADIUS),
+    swing_period=7.5,
+    display_time=40
+  ),
+  lambda:
+  SwingingSpotlightPattern(
+    colour1=led_colour.PURPLE,
+    colour2=led_colour.ORANGE,
+    spotlight_radius=random.randint(MIN_SWINGING_SPOTLIGHT_RADIUS,
+                                    MAX_SWINGING_SPOTLIGHT_RADIUS),
+    swing_period=7.5,
+    display_time=40
+  ),
+  lambda:
+  SwingingSpotlightPattern(
+    colour1=led_colour.ORANGE,
+    colour2=led_colour.ORANGE,
+    spotlight_radius=random.randint(MIN_SWINGING_SPOTLIGHT_RADIUS,
+                                    MAX_SWINGING_SPOTLIGHT_RADIUS),
+    swing_period=7.5,
+    display_time=40
+  )
 ]
 HOLIDAY_PATTERNS = [
   lambda:
@@ -100,12 +159,12 @@ HOLIDAY_PATTERNS = [
     interpolation_mode=LinearInterpolation(),
     colour_palette=stream_pattern.create_colour_cycle(
       palette.choose_random_from(
-      [
-        led_colour.BLUE,
-        led_colour.GOLD,
-        led_colour.WHITE]),
-    NUM_LEDS,
-    random.randint(MIN_STREAM_COLOUR_LENGTH, MAX_STREAM_COLOUR_LENGTH)),
+        [
+          led_colour.BLUE,
+          led_colour.GOLD,
+          led_colour.WHITE]),
+      NUM_LEDS,
+      random.randint(MIN_STREAM_COLOUR_LENGTH, MAX_STREAM_COLOUR_LENGTH)),
     display_time=30
   ),
   lambda:
@@ -121,7 +180,10 @@ HOLIDAY_PATTERNS = [
 
 month = datetime.now().month
 print("The current month is {0}.".format(month))
-if month == 12:
+if month == 10:
+  print("Let's celebrate with Halloween patterns!")
+  pattern_factories = HALLOWEEN_PATTERNS
+elif month == 12:
   print("Let's celebrate with holiday patterns!")
   pattern_factories = HOLIDAY_PATTERNS
 else:

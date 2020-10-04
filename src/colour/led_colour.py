@@ -50,6 +50,7 @@ class Colour:
 WHITE = Colour(255, 255, 255, "White")
 RED = Colour(255, 0, 0, "Red")
 DARK_RED = Colour(50, 0, 0, "Dark Red")
+ORANGE = Colour(150, 50, 0, "Orange")
 GREEN = Colour(0, 255, 0, "Green")
 DARK_GREEN = Colour(0, 50, 0, "Dark Green")
 BLUE = Colour(0, 0, 255, "Blue")
