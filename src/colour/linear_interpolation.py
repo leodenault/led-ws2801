@@ -1,4 +1,4 @@
-from interpolation_mode import InterpolationMode
+from colour.interpolation_mode import InterpolationMode
 
 
 class LinearInterpolation(InterpolationMode):

@@ -1,6 +1,6 @@
 import math
 
-from timed_pattern import TimedPattern
+from pattern.timed_pattern import TimedPattern
 
 
 def create_colour_cycle(

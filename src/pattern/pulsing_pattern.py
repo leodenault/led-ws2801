@@ -1,4 +1,4 @@
-from timed_pattern import TimedPattern
+from pattern.timed_pattern import TimedPattern
 import math
 
 _AMPLITUDE = 0.5

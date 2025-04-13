@@ -1,7 +1,7 @@
 import math
 import random
 from colour import led_colour
-from timed_pattern import TimedPattern
+from pattern.timed_pattern import TimedPattern
 
 
 _AMPLITUDE = 0.5

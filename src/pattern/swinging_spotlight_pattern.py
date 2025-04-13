@@ -1,7 +1,7 @@
 import math
 
-from renderable.spotlight import Spotlight
-from timed_pattern import TimedPattern
+from pattern.renderable.spotlight import Spotlight
+from pattern.timed_pattern import TimedPattern
 
 _PHASE_SHIFT = -math.pi / 2
 

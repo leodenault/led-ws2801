@@ -1,4 +1,4 @@
-from transition import Transition
+from pattern.transition.transition import Transition
 from display.led_strip import DrawingMode
 
 

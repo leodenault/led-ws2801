@@ -1,6 +1,6 @@
 from abc import ABCMeta
 
-from pattern import Pattern
+from pattern.pattern import Pattern
 
 
 class TimedPattern(Pattern):

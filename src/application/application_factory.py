@@ -1,6 +1,6 @@
 """Factory methods for creating an Application object.
 """
-from application import Application
+from application.application import Application
 from display.led_strip import LedDirection
 
 

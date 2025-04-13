@@ -1,7 +1,7 @@
 import math
 
 from display.led_strip import DrawingMode
-from renderable import Renderable
+from pattern.renderable.renderable import Renderable
 
 
 class Spotlight(Renderable):
