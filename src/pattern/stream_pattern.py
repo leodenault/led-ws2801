@@ -18,7 +18,7 @@ def create_colour_cycle(
   """
   return [
     base_colours[
-      i / inidividual_colour_length % len(base_colours)
+      math.floor(i / inidividual_colour_length) % len(base_colours)
       ] for i in range(0, total_colours)]
 
 
